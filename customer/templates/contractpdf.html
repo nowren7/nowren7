@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Merged Data</title>
+</head>
+<body>
+
+<h1>Merged Data</h1>
+
+{% if merged_data %}
+<table border="1">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Phone Number</th>
+            <th>Document ID</th>
+            <th>Vehicle No</th>
+            <th>Ride Distance</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Ride Duration</th>
+            <th>Total Cost</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in merged_data %}
+        <tr>
+            <td>{{ row.ID }}</td>
+            <td>{{ row.name }}</td>
+            <td>{{ row.email }}</td>
+            <td>{{ row.phonenumber }}</td>
+            <td>{{ row.documentID }}</td>
+            <td>{{ row.Vehicle_No }}</td>
+            <td>{{ row.Ride_distance }}</td>
+            <td>{{ row.Start_date }}</td>
+            <td>{{ row.End_date }}</td>
+            <td>{{ row.Ride_duration }}</td>
+            <td>{{ row.Total_cost }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+    <p>No merged data available.</p>
+{% endif %}
+
+</body>
+</html>

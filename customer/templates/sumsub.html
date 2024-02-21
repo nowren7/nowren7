@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Data</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+    <h2>Customer Data</h2>
+    
+        {% for key, value in data.items %}
+            {% if key == 'info' %}
+                <tr>
+                    <th>{{ key }}</th>
+                    <th>
+                        <table>
+                            {% for info_key, info_value in value.items %}
+                                <tr>
+                                    <td>{{ info_key }}</td>
+                                    <td>{{ info_value }}</td>
+                                    {% if info_key == 'idDocs' %}
+                                    {% for doc in info_value %}
+                                    <tr>
+                                        {% for doc_key, doc_value in doc.items %}
+                                            <td>{{ doc_key }}</td>
+                                            <td>{{ doc_value }}</td>
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </th>
+                </tr>
+            {% else %}
+                <tr>
+                    
+                </tr>
+            {% endif %}
+        {% endfor %}
+    
+</body>
+</html>

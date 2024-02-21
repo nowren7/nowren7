@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <meta charset="UTF-8">
+    <title>Uploads</title>
+</head>
+<body style="background-color: rgba(82, 76, 76, 0.219);">
+    <h1 style="text-align: center;font-family: 'Poppins', sans-serif; font-weight: 400;font-style: normal;">Uploads</h1>
+    <div class="upload-form">
+        <div style="display: inline-block; margin-top: 30px;">
+            <h2 style="font-family: 'Poppins', sans-serif; font-weight: 400;font-style: normal; color: white; font-size: 20px;margin-bottom: 10px;">Rides</h2>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="exceltable" style="display: inline-block;">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="file" id="fileInput" style="display: none; color: aliceblue;">
+            <button type="submit" style="font-family: 'Poppins';">Upload</button>
+        </form>
+    </div>
+    
+    <div class="upload-form" style="border: 2px solid #000; padding: 10px; margin-bottom: 20px;">
+        <div style="display: inline-block; margin-top: 30px;">
+            <h2 style="font-family: 'Poppins', sans-serif; font-weight: 400;font-style: normal; color: white; font-size: 20px;margin-bottom: 10px;">Customers</h2>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="exceltablecustomer" style="display: inline-block;">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit" style="font-family: 'Poppins';">Upload</button>
+        </form>  
+    </div>
+    <div class="upload-form"  style="border: 2px solid #000; padding: 10px; margin-bottom: 20px;">
+        <div style="display: inline-block; margin-top: 30px;">
+            <h2 style="font-family: 'Poppins', sans-serif; font-weight: 400;font-style: normal; color: white; font-size: 20px;margin-bottom: 10px;">Salik</h2>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="salikurl" style="display: inline-block;">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit" style="font-family: 'Poppins';">Upload</button>
+        </form>
+    </div>
+    <div class="upload-form"  style="border: 2px solid #000; padding: 10px; margin-bottom: 20px;">
+        <div style="display: inline-block; margin-top: 30px;">
+            <h2 style="font-family: 'Poppins', sans-serif; font-weight: 400;font-style: normal; color: white; font-size: 20px;margin-bottom: 10px;">Fines</h2>
+        </div>
+        <form method="POST" enctype="multipart/form-data" action="finesurl" style="display: inline-block;">
+            {% csrf_token %}
+            {{form.as_p}}
+            <button type="submit" style="font-family: 'Poppins';">Upload</button>
+        </form>
+    </div>
+
+    <style>
+        .upload-form {
+            border: 2px solid #000;
+            padding: 10px;
+            margin: 0 auto; /* Center the form horizontally */
+            margin-bottom: 20px;
+            border-radius: 10px;
+            display: block; /* Change display to block to center horizontally */
+            background-color: #0c0429;
+            width: 50%;
+            height: 80px;
+}
+    
+    
+        .upload-form form {
+            display: flex;
+            align-items: center;
+            color: rgb(39, 231, 135);
+            /* margin-top: 100px; */
+            margin-left: 200px;
+
+        }
+    
+        .upload-form form button {
+            margin-left: 260px;
+            border-radius: 5px;
+            background-color: rgb(39, 231, 135);
+            /* margin-bottom: 10px; */
+        }
+    </style>
+
+
+</body>
+</html>

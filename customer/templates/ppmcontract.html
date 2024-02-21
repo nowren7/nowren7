@@ -1,0 +1,332 @@
+{% load static %}
+<!DOCTYPE html>
+
+{% if messages %}
+    {% for message in messages %}
+        {% if message.tags == 'success' %}
+            <script>alert( "This is success message:{{ message }}" )</script>
+        {% elif message.tags == 'warning'%}
+            <script>alert( "This is warning message :{{ message }}" )</script>
+        {% elif message.tags == 'error'%}
+            <script>alert( "This is error message:{{ message }}" )</script>
+        {% else %}
+            <script>alert( "This is info message:{{ message }}" )</script>
+        {% endif %}
+    {% endfor %}
+{% endif %}
+<!-- saved from url=(0053)https://colorlib.com/etc/cf/ContactFrom_v5/index.html -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html lang="en"><head><meta charset="UTF-8" http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Contract </title>
+
+
+
+
+<link rel="icon" type="image/png" href="https://colorlib.com/etc/cf/ContactFrom_v5/images/icons/favicon.ico">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/bootstrap.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/font-awesome.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/material-design-iconic-font.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/animate.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/hamburgers.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/animsition.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/select2.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/daterangepicker.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/nouislider.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/util.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'Contact V5_files/main.css'%}">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Audiowide|Sofia|Trirong">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+    @page {
+            size: A4;
+            margin: 0;
+        }
+
+    body {
+            margin: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+    }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    /* Ensuring full page height */
+    /* html, body {
+        height: 200%;
+    } */
+
+    /* Centering the form vertically and horizontally */
+    .form-container {
+        /* width: 210mm; 
+        height: 297mm; */
+        /* margin: auto; */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
+    
+    
+
+
+    .contact100-form-title{
+        text-align: center;
+        padding-bottom: 10px;
+        font-size: 30px;
+        
+    }
+
+    .wrap-input100 {
+    margin-bottom: 5px; /* Adjust the margin as needed to reduce space between columns */
+    width: 48%;
+    }
+
+    .list-container {
+            list-style-type: square;
+            background-color: #f0f0f0; 
+            padding: 0px; 
+            margin: 0px 0;
+            /* border-radius: 10px;  */
+    }
+
+       
+    ul {
+        list-style-type: square;
+        margin: 0; /* Remove default margin for better alignment */
+        padding: 0; /* Remove default padding for better alignment */
+    }
+
+       
+    ul li {
+        list-style-type: square;
+        padding: 0px; 
+        margin: 0px 0;
+        font-size: 14px; 
+        font-family: 'Trirong', serif;
+        color: #000000; 
+    }
+
+    /* .wrap-input100 input {
+    padding: 1px; /* Adjust the padding as needed */
+    /* padding-top: -10px; */
+    /* } */ 
+
+    /* .sealimg{
+        transition: transform 0.5s ease-in-out;
+        width: 80px;
+        height: 100px;
+    } */
+
+    .flex-container {
+        display: flex;
+        justify-content: space-between; 
+    }
+
+    .bg1 {
+        background-color: #f0f0f0; 
+    }
+
+    .page {
+            page-break-after: always;
+            position: relative;
+    }
+
+    .page-numberone {
+            position: absolute;
+            bottom: 10px;
+            left: 20px;
+            font-size: 12px;
+    }
+    /* .page-numbertwo {
+            position: absolute;
+            top: 150%;
+            left: 20px;
+            font-size: 12px;
+    } */
+
+
+</style>
+<body>
+<div  class="form-container">
+    <div class="wrap-contact100">
+        <div class="page">
+            <form class="contact100-form validate-form">
+                <img src="{% static 'img/Image_001.jpg' %}" alt="Your Logo" width="240" height="80" style="margin-bottom: 20px;">
+                <div class="rightimage">
+                    <img src="{% static 'img/rightscrnsht.png' %}"  width="230" height="100" style="margin-bottom: 20px;">
+                </div>
+                <span class="contact100-form-title" style="font-family: 'Poppins', sans-serif; font-size:25px; font-weight: bold; color: #333;">
+                    Per-Minute Rental Contract
+                </span>          
+                <div  class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif; align-items: center;margin-left: 55%; font-size: 15px; background-color: #dee2ea;">
+                    <label for="{{ forms.rideid.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">AgreementNo:</label>
+                    <input type="text" name="{{ forms.Ride_ID.name }}" value="{{ forms.Ride_ID.value }}" style="background-color: #dee2ea;">
+                </div>                        
+                        <label class="contact100-form-title" style=" font-size: 20px; font-family: 'Poppins', sans-serif; height: 13px;margin-bottom: 20px;">Customer Information</label>
+                        {% for row in customer_info %}
+                            <div class="wrap-input100 validate-input bg1" style="width: 48%; font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                                {% for column_name, value in row.items %}
+                                    <label>{{ column_name }}:</label>
+                                    <input value="{{ value }}"  readonly style="width: 61%; background-color: #dee2ea;  height: 13px;">
+                                {% endfor %}
+                            </div>
+                        {% endfor %}
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label for="{{ forms.userphone.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">Contact No:</label>
+                            <input type="text"  name="{{ forms.User_PhoneNo.name }}" value="{{ forms.User_PhoneNo.value }}" style="background-color: #dee2ea; height: 13px;">                
+                        </div>
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label for="{{ forms.rideid.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">Ride ID:</label>
+                            <input type="text"  name="{{ forms.Ride_ID.name }}" value="{{ forms.Ride_ID.value }}" style="background-color: #dee2ea;  height: 13px;">
+                        </div>
+                        <label  class="contact100-form-title" style="font-family: 'Poppins', sans-serif; font-size: 20px;margin-bottom: 0px;">Vehicle Information</label>
+                <form method="get" action="{% url 'download_form' %}">
+                    {% csrf_token %}
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label for="{{ forms.vehicle_no.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">Plate:</label>
+                            <input type="text"  name="{{ forms.Vehicle_No.name }}" value="{{ forms.Vehicle_No.value }}" style="background-color: #dee2ea;  height: 13px;">
+                        </div>   
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label for="{{ forms.ride_duration.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">Duration:</label>
+                            <input type="text"  name="{{ forms.Ride_duration.name }}" value="{{ forms.Ride_duration.value }}" style="background-color: #dee2ea;  height: 13px;">
+                        </div>
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label>Odometer Start:</label>
+                            <input type="text" style="background-color: #dee2ea; height: 13px;">
+                        </div>
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label>Odometer End:</label>
+                            <input type="text" style="background-color: #dee2ea; height: 13px;">
+                        </div>
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px;background-color: #dee2ea;">
+                            <label for="{{ forms.start_date.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">Trip Start:</label>
+                            <input type="text"  name="{{ forms.Start_date.name }}" value="{{ forms.Start_date.value }}" style="background-color: #dee2ea; height: 13px;">
+                        </div>
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label for="{{ forms.end_date.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">Trip End:</label>
+                            <input type="text"  name="{{ forms.End_date.name }}" value="{{ forms.End_date.value }}" style="background-color: #dee2ea; height: 13px;">
+                        </div>                
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label for="{{ forms.ride_distance.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">Distance:</label>
+                            <input type="text" name="{{ forms.Ride_distance.name }}" value="{{ forms.Ride_distance.value }}" style="background-color: #dee2ea; height: 13px;" >
+                        </div>                    
+                        <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                            <label for="{{ forms.total_cost.id_for_label }}">Invoice Amount:</label>
+                            <input type="text" name="{{ forms.Total_cost.name }}" style="font-size: 14px; background-color: #dee2ea; height: 13px;" value="{{ forms.Total_cost.value }}">
+                        </div>
+                        <label  class="contact100-form-title" style="font-family: 'Poppins', sans-serif; font-size: 20px;margin-top: 8px;">Terms & Conditions</label>
+                        <div class="terms" style="font-family: 'Poppins', sans-serif;" >                       
+                            <ul>
+                                <li><b>Payment for Salik & Fines:</b>The lessee is responsible for settling all Salik or Traffic Fine charges invoiced by the Yaldi Team within 7 days from the ride.</li>
+                                <li><b>Additional Usage Charges:</b>Our per-minute rental offer is based on a daily allowance of 200km. Additional mileage will incur a charge of AED 0.95/km.</li>
+                                <li><b>Accidents and Police Reports:</b>In the event of an accident, the lessee must submit to yaldi the police report within 48 hours. Failure to do so will result in the lessee being liable for the full repair costs of the vehicle. For liable/red police reports or 1 party police reports, an excess amount of AED 500 applies.</li>
+                                <li><b>Driver Age Restriction:</b>Drivers under the age of 21 are prohibited from operating Yaldi cars.</li>
+                                <li><b>Late Payment Penalties:</b>Failure to settle outstanding balances within 7 days will result in an additional charge of AED 250. Yaldi reserves the right to pursue legal action for unpaid balances, with any associated legal fees borne by the lessee.</li>
+                                <li><b>Parking Fees:</b>Yaldi will charge all fees associated with relocating the vehicle from soil parking, mall parking, valet parking, underground parking, and private parking lots, along with an administrative fee of AED 100.</li>
+                                <li><b>Relocation Fees:</b>A relocation fee of AED 250 applies if the trip ends less than 180 km from Dubai, and AED 750 if farther than 180 km from Dubai.</li>
+                                <li><b>Drained Battery:</b>A fee of AED 100 plus the actual cost of battery replacement applies in cases of drained batteries due to negligence such as leaving headlights or internal lights on.</li>
+                                <li><b>Vehicle Security:</b>An administrative fee of AED 100 applies for unsecured vehicle conditions, including open doors, keys in the ignition, open trunk/boot, open windows, or open sunroof.</li>
+                                <li><b>Driver Age and Authorization Charges:</b>For drivers under 25 years old or unauthorized drivers, an excess amount of AED 500 plus 20% of the total claim will be charged.</li>
+                                <li><b>Total Loss Cases:</b>In cases of total loss, an excess amount of AED 4,000 applies.</li>
+                            </ul>
+                        </div>
+                </form>
+            </form>
+            <!-- <div class="page-number">Page 1 of 2</div> -->
+        </div>
+        <div class="page-numberone">Page 1 of 2</div>
+        
+    </div>
+</div>
+<div class="form-container">
+    <div class="wrap-contact100">
+        <div class="page">
+            <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif;font-size: 15px; background-color: #dee2ea;">
+                <label for="{{ forms.rideid.id_for_label }}"  style="margin-right: 10px; background-color: #dee2ea;">Ride ID:</label>
+                <input type="text" name="{{ forms.Ride_ID.name }}" value="{{ forms.Ride_ID.value }}" style="background-color: #dee2ea;  height: 13px;">
+            </div>
+            <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif; align-items: center; margin-left: 55%; font-size: 15px; margin-top: -7%; width: 46%; background-color: #dee2ea;">
+                <label for="{{ forms.rideid.id_for_label }}" style="margin-right: 10px; background-color: #dee2ea;">AgreementNo:</label>
+                <input type="text" name="{{ forms.Ride_ID.name }}" value="{{ forms.Ride_ID.value }}" style="background-color: #dee2ea;"> <!-- Change color as per your requirement -->
+            </div>
+            
+
+            <div class="termssecond" style="margin-top: 8%; font-family: 'Poppins', sans-serif;">                       
+                <ul>
+                    <li><b>Repair Authorization:</b>If the lessee fails to provide a police report, Yaldi reserves the right to arrange vehicle repairs at an authorized agency or workshop of their choice and bill the full amount to the lessee.</li>
+                    <li><b>Impounding Cases:</b>In cases of impounding by police or other government authorities, the lessee is liable for penalty charges + towing fees + administrative fee of AED 100.</li>
+                    <li><b>Wheel, Tire, and Rim Damage:</b>Costs for repair or replacement of damaged wheels, tires, and rims, along with an administrative fee of AED 100, will be charged.</li>
+                    <li><b>Smoking Policy:</b>Smoking inside the car will incur a fee of AED 300.</li>
+                    <li><b>Interior Damage:</b>Damages or stains to the interior of the car will result in a charge of AED 750, plus any additional repair costs.</li>
+                    <li><b>Missing Keys or Safety Equipment:</b>Replacement costs for missing keys or safety equipment, along with an administrative fee of AED 100, will be charged. Failure to inform Yaldi about missing keys before ending the ride will result in additional charges for the duration until notification.</li>
+                    <li><b>Low Fuel Charges:</b>A fee of AED 25 will be charged for long-term vehicle returns with less than 20% fuel.</li>
+                    <li><b>Unauthorized use:</b>Driving the vehicle after ending the ride will incur a charge of AED 5.0/km or AED 4.0/min (whichever is higher) counted from time and odometer at the time of ending the ride. In these cases, Yaldi will also have the right to report (to local Police Department) the vehicle as stolen and proceed filing complaint if the leasee refuses to accept communication from representatives from Yaldi.</li>   
+                    <li>For full terms and conditions, please visit : <a href="https://yaldi.ae/terms-and-conditions/">https://yaldi.ae/terms-and-conditions/</a></li>
+                </ul>
+            </div>
+            <div class="row" style="margin-top: 5%;">
+                <img src="{% static 'img/seal2.png' %}"  width="180" height="150"  alt="Your Image" id="imageElement" >
+                <div class="wrap-input100 validate-input bg1" style="font-family: 'Poppins', sans-serif; margin-left: 25%; background-color: #dee2ea;">
+                    <label style="margin-left: 85px;">Yaldi Rental Agent:</label>
+                    <input type="text" style="font-size: 25px; height: 60px;background-color: #dee2ea;">
+                </div> 
+            </div>
+            
+            <div style="font-size: 10px; font-family: 'Poppins', sans-serif;  font-weight: bold; margin-top: 5%; ">
+                <label>This is a system generated agreement on Yaldi application during the start of the above ride agreeing to the terms and conditions mentioned in the application and website. No signature is needed.</label>
+            </div>
+            
+            <div style="left: 20px; font-size: 12px; margin-top: 70%;">
+                <label>Page 2 of 2</label>
+            </div>
+
+        </div>
+        
+
+
+    </div>
+</div>
+
+
+<script>
+    // Rotate the image by 45 degrees using JavaScript
+    var imageElement = document.getElementById('imageElement');
+    imageElement.style.transform = 'rotate(1deg)';
+</script>
+
+<!-- get title with rideid -->
+<script>
+    // Function to extract query parameters from the URL
+    function getQueryParam(name) {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get(name);
+    }
+
+    // Get the Ride_ID from the URL
+    var rideId = getQueryParam('Ride_ID');
+
+    // Set the document title with the Ride_ID
+    if (rideId) {
+        document.title = "Contract -" + rideId;
+    }
+</script>
+
+
+
+</body></html>

@@ -1,0 +1,142 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+
+<!-- saved from url=(0047)https://colorlib.com/etc/lf/Login_v3/index.html -->
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Contract Login</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="icon" type="image/png" href="{% static 'img/yaldilogo.png'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/bootstrap.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/font-awesome.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/material-design-iconic-font.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/animate.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/hamburgers.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/animsition.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/select2.min.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/daterangepicker.css'%}">
+
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/util.css'%}">
+<link rel="stylesheet" type="text/css" href="{% static 'Login V3_files/main.css'%}">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap" rel="stylesheet">
+
+<meta name="robots" content="noindex, follow">
+<script type="text/javascript" async="" src="{% static 'Login V3_files/analytics.js.download'%}" nonce="ec361a57-a86b-44a3-a5f5-a4efd7fffc0c"></script><script defer="" referrerpolicy="origin" src="{% static 'Login V3_files/s.js.download'%}"></script><script nonce="ec361a57-a86b-44a3-a5f5-a4efd7fffc0c">try{(function(w,d){!function(bS,bT,bU,bV){bS[bU]=bS[bU]||{};bS[bU].executed=[];bS.zaraz={deferred:[],listeners:[]};bS.zaraz.q=[];bS.zaraz._f=function(bW){return async function(){var bX=Array.prototype.slice.call(arguments);bS.zaraz.q.push({m:bW,a:bX})}};for(const bY of["track","set","debug"])bS.zaraz[bY]=bS.zaraz._f(bY);bS.zaraz.init=()=>{var bZ=bT.getElementsByTagName(bV)[0],b$=bT.createElement(bV),ca=bT.getElementsByTagName("title")[0];ca&&(bS[bU].t=bT.getElementsByTagName("title")[0].text);bS[bU].x=Math.random();bS[bU].w=bS.screen.width;bS[bU].h=bS.screen.height;bS[bU].j=bS.innerHeight;bS[bU].e=bS.innerWidth;bS[bU].l=bS.location.href;bS[bU].r=bT.referrer;bS[bU].k=bS.screen.colorDepth;bS[bU].n=bT.characterSet;bS[bU].o=(new Date).getTimezoneOffset();if(bS.dataLayer)for(const ce of Object.entries(Object.entries(dataLayer).reduce(((cf,cg)=>({...cf[1],...cg[1]})),{})))zaraz.set(ce[0],ce[1],{scope:"page"});bS[bU].q=[];for(;bS.zaraz.q.length;){const ch=bS.zaraz.q.shift();bS[bU].q.push(ch)}b$.defer=!0;for(const ci of[localStorage,sessionStorage])Object.keys(ci||{}).filter((ck=>ck.startsWith("_zaraz_"))).forEach((cj=>{try{bS[bU]["z_"+cj.slice(7)]=JSON.parse(ci.getItem(cj))}catch{bS[bU]["z_"+cj.slice(7)]=ci.getItem(cj)}}));b$.referrerPolicy="origin";b$.src="/cdn-cgi/zaraz/s.js?z="+btoa(encodeURIComponent(JSON.stringify(bS[bU])));bZ.parentNode.insertBefore(b$,bZ)};["complete","interactive"].includes(bT.readyState)?zaraz.init():bS.addEventListener("DOMContentLoaded",zaraz.init)}(w,d,"zarazData","script");})(window,document)}catch(e){throw fetch("/cdn-cgi/zaraz/t"),e;};</script>
+
+</head>
+<body>
+<div class="limiter" style="color: black;" >
+<div  style="background-color: black;">
+<div class="loginform" style="color: black; height: 80%; background-color: #0c0429;;">
+    <form id="loginForm" class="login100-form validate-form" action="{% url 'login' %}" method="post" style="height: 500px; width: 500px; border: 2px solid #0c0429; margin-left: 650px;">
+        {% csrf_token %}
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    
+        <!-- Error message container -->
+        <div id="errorMessage" style="display: none;">
+            User not found. Please try again.
+        </div>
+    
+        <div style="display: flex; justify-content: center; align-items: center;">
+            <img src="{% static 'img/yaldilogo.png' %}" alt="Your Logo" style="width: 100px; height: 100px;margin-top: 70px;">
+        </div>
+
+
+        <div class="wrap-input100 validate-input" data-validate="Enter username">
+            <input id="username" class="input100" type="text" name="username" placeholder="Username " style="font-family: 'Poppins'; padding-left: 40px; margin-top: 40px;">
+            <img class="focus-input100" src="{% static 'Login V3_files/user.png' %}" style="height: 20px; width: 30px;margin-top: 13px;">
+        </div>
+        <div class="wrap-input100 validate-input" data-validate="Enter password">
+            <input id="password" class="input100" type="password" name="password" placeholder="Password" style="font-family: 'Poppins'; padding-left: 40px; margin-top: 20px;">
+            <img class="focus-input100" src="{% static 'Login V3_files/lock.png' %}" style="height: 22px; width: 22px; margin-top: 10px; margin-left: 8px;" >
+        </div>
+
+    
+        <div class="container-login100-form-btn">
+            <!-- Call the login function on button click -->
+            <button onclick="login()" class="login100-form-btn" style="font-family: 'Poppins';margin-top: 20px;">
+                Login
+            </button>
+        </div>
+    
+    </form>
+</div>
+</div>
+</div>
+<div id="dropDownSelect1"></div>
+
+<script src="{% static 'Login V3_files/jquery-3.2.1.min.js.download'%}"></script>
+
+<script src="{% static 'Login V3_files/animsition.min.js.download'%}"></script>
+
+<script src="{% static 'Login V3_files/popper.js.download'%}"></script>
+<script src="{% static 'Login V3_files/bootstrap.min.js.download'%}"></script>
+
+<script src="{% static 'Login V3_files/select2.min.js.download'%}"></script>
+
+<script src="{% static 'Login V3_files/moment.min.js.download'%}"></script>
+<script src="{% static 'Login V3_files/daterangepicker.js.download'%}"></script>
+
+<script src="{% static 'Login V3_files/countdowntime.js.download'%}"></script>
+
+<script src="{% static 'Login V3_files/main.js.download'%}"></script>
+
+<script async="" src="{% static 'Login V3_files/js'%}"></script>
+<script>
+	  window.dataLayer = window.dataLayer || [];
+	  function gtag(){dataLayer.push(arguments);}
+	  gtag('js', new Date());
+
+	  gtag('config', 'UA-23581568-13');
+	</script>
+<script defer="" src="{% static 'Login V3_files/v84a3a4012de94ce1a686ba8c167c359c1696973893317'%}" integrity="sha512-euoFGowhlaLqXsPWQ48qSkBSCFs3DPRyiwVu3FjR96cMPx+Fr+gpWRhIafcHwqwCqWS42RZhIudOvEI+Ckf6MA==" data-cf-beacon="{&quot;rayId&quot;:&quot;8563a9bb98c52a1d&quot;,&quot;version&quot;:&quot;2024.2.0&quot;,&quot;token&quot;:&quot;cd0b4b3a733644fc843ef0b185f98241&quot;}" crossorigin="anonymous"></script>
+
+
+<script>
+    function login() {
+        // Get username and password values
+        var username = document.getElementById("username").value;
+        var password = document.getElementById("password").value;
+
+        // Send a request to the server to check credentials
+        // You can use fetch or XMLHttpRequest for this purpose
+
+        // For demonstration, let's assume the login is successful
+        // Redirect the user to the users page
+        window.location.href = "/loginpage"; // Replace "/users" with the actual URL of your users page
+    }
+</script>
+
+<script>
+    if (window.history && window.history.pushState) {
+        window.history.pushState('', '', window.location.href);
+        window.onpopstate = function () {
+            window.history.pushState('', '', window.location.href);
+        };
+    }
+</script>
+
+
+
+
+
+</body></html>
