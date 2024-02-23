@@ -48,6 +48,14 @@ class CustomerDetails(models.Model):
          return str(self.ID)
     
 class SalikDetails(models.Model):
+    STATUS_CHOICES = [
+        ('Not started', 'Not started'),
+        ('Pending', 'Pending'),
+        ('Invoiced', 'Invoiced'),
+        ('Partial Paid', 'Partial Paid'),
+        ('Paid', 'Paid'),
+    ]
+
     TarnsactionID=models.CharField(max_length=100)
     TripDate= models.DateField(null=False, blank=True)
     TripTime = models.TimeField(null=True, blank=True)  
@@ -55,7 +63,7 @@ class SalikDetails(models.Model):
     Amount=models.CharField(max_length=30)
     Ride_ID = models.CharField(max_length=60, null=True, blank=True)
     UserId = models.IntegerField(null=True, blank=True)
-
+    Status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
 
     class Meta:
         verbose_name = 'Salik'
@@ -64,6 +72,14 @@ class SalikDetails(models.Model):
         return self.TarnsactionID
     
 class FinesDetails(models.Model):
+    STATUS_CHOICES = [
+        ('Not started', 'Not started'),
+        ('Pending', 'Pending'),
+        ('Invoiced', 'Invoiced'),
+        ('Partial Paid', 'Partial Paid'),
+        ('Paid', 'Paid'),
+    ]
+
     PlateNo = models.CharField(max_length=100)
     PlateCode = models.CharField(max_length=100)
     PlateCategory = models.CharField(max_length=100)
@@ -77,6 +93,7 @@ class FinesDetails(models.Model):
     TicketStatus = models.CharField(max_length=100)
     TermsoftheOffense = models.CharField(max_length=100)
     Ride_ID = models.CharField(max_length=60, null=True, blank=True)
+    Status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
 
     class Meta:
         verbose_name = 'Fines'

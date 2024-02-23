@@ -99,7 +99,7 @@
           </a>
         </li>
         <li class="nav-item">
-          <a class="nav-link text-white " href="/">
+          <a class="nav-link text-white " href="users">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
               <i class="material-icons opacity-10">people</i>
             </div>
@@ -268,7 +268,7 @@
               <td>{{ item.email }}</td>
               <td>{{ item.role }}</td>
               <td>
-                <button style="color: #F33A6A;" onclick="openEditForm('{{ item.id }}', '{{ item.name }}', '{{ item.email }}', '{{ item.role }}')">Edit</button>
+                  <button style="color: #F33A6A;" onclick="openEditForm('{{ item.id }}', '{{ item.name }}', '{{ item.email }}', '{{ item.role }}','{{item.password}}')">Edit</button>
                   <button style="color: #F33A6A;" onclick="deleteUser('{{ item.id }}')" data-user-id="{{ item.id }}">Delete</button>
               </td>
             </tr>          
@@ -278,6 +278,8 @@
         {% endblock %}        
       </div>
     </div>
+
+
     <div class="modal fade" id="addUserModal" tabindex="-1" aria-labelledby="addUserModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
@@ -318,7 +320,6 @@
     </div>
 
     <!-- Edit User Modal -->
-    <!-- Edit User Modal -->
     <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
@@ -327,8 +328,8 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <!-- Form for editing a user -->
-            <form id="editUserForm"  method="POST">
+          <!-- Form for editing a user -->
+          <form id="editUserForm" method="POST" >
               {% csrf_token %}
               <input type="hidden" id="editUserId" name="id">
               <div class="mb-3">
@@ -343,6 +344,10 @@
                 <label for="editRole" class="form-label">Role</label>
                 <input type="text" class="form-control" id="editRole" name="role" required>
               </div>
+              <div class="mb-3">
+                <label for="editPassword" class="form-label">Password</label>
+                <input type="text" class="form-control" id="editPassword" name="password" required>
+              </div>
               <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
               <button type="submit" class="btn btn-primary" id="saveEditUserBtn">Save</button>
             </form>            
@@ -350,6 +355,9 @@
         </div>
       </div>
     </div>
+
+  </div>
+
 
 
   </main>
@@ -576,12 +584,14 @@
       var name = document.getElementById('name').value;
       var email = document.getElementById('email').value;
       var role = document.getElementById('role').value;
+      var password = document.getElementById('password').value;
 
       // Prepare data to send
       var userData = {
           'name': name,
           'email': email,
-          'role': role
+          'role': role,
+          'password':password
       };
 
       // Send POST request to server
@@ -619,6 +629,7 @@
           document.getElementById('name').value = '';
           document.getElementById('email').value = '';
           document.getElementById('role').value = '';
+          document.getElementById('password').value = '';
           // Close the modal
           var modal = bootstrap.Modal.getInstance(document.getElementById('addUserModal'));
           modal.hide();
@@ -675,20 +686,25 @@
 </script>
 
 
-
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/5.1.3/js/bootstrap.bundle.min.js"></script>
 <script>
   // Function to open the edit form and populate it with user data
-  document.openEditForm('saveEditUserBtn').addEventListener('click', function() {
+  function openEditForm(id, name, email, role,password) {
     document.getElementById('editUserId').value = id;
     document.getElementById('editName').value = name;
     document.getElementById('editEmail').value = email;
     document.getElementById('editRole').value = role;
-    $('#editUserModal').modal('show'); // Assuming you're using Bootstrap modal
+    document.getElementById('editPassword').value = password;
+    $('#editUserModal').modal('show'); // Show the edit form
+  }
+
+  // Event listener for form submission
+  document.getElementById('editUserForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
+    saveEditedUser();
   });
-</script>
 
-
-<script>
   // Function to submit the edited data
   function saveEditedUser() {
     // Retrieve edited data from the form
@@ -696,34 +712,62 @@
     var name = document.getElementById('editName').value;
     var email = document.getElementById('editEmail').value;
     var role = document.getElementById('editRole').value;
+    var password = document.getElementById('editPassword').value;
+    
+    // Get CSRF token from cookies
+    var csrftoken = getCookie('csrftoken');
 
     // Send the edited data to the server using AJAX
     $.ajax({
-        url: `/edit_user/${id}/`,
-        type: 'POST',
-        data: {
-            name: name,
-            email: email,
-            role: role,
-            csrfmiddlewaretoken: '{{ csrf_token }}' // Ensure CSRF token is included
-        },
-        success: function(response) {
-            // Handle success response
-            console.log('User updated successfully:', response);
-            // Update the corresponding row in the table
-            var row = document.getElementById(`userRow-${id}`);
-            row.cells[0].textContent = name;
-            row.cells[1].textContent = email;
-            row.cells[2].textContent = role;
-            $('#editUserModal').modal('hide'); // Hide the edit form
-        },
-        error: function(xhr, errmsg, err) {
-            // Handle error
-            console.error('Error updating user:', errmsg);
-        }
+      url: `/edit_user/${id}/`,
+      type: 'POST',
+      headers: {
+        'X-CSRFToken': csrftoken
+      },
+      data: {
+        name: name,
+        email: email,
+        role: role,
+        password: password,
+      },
+      success: function(response) {
+        // Handle success response
+        console.log('User updated successfully:', response);
+        // Update the corresponding row in the table
+        var row = document.getElementById(`userRow-${id}`);
+        row.cells[0].textContent = name;
+        row.cells[1].textContent = email;
+        row.cells[2].textContent = role;
+        // row.cells[3].textContent = password;
+        $('#editUserModal').modal('hide'); // Hide the edit form
+      },
+      error: function(xhr, errmsg, err) {
+        // Handle error
+        console.error('Error updating user:', errmsg);
+      }
     });
   }
+
+  // Function to get CSRF token from cookies
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
 </script>
+
+
+
+
 
 
 

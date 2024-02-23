@@ -270,14 +270,44 @@
                       <td>{{ item.Plate }}</td>
                       <td>{{ item.Ride_ID }}</td>
                       <td>{{ item.UserId }}</td>
-                      <!-- <td>
-                          <a href="{% url 'download_form' %}?{% for key, value in item.items %}{{ key }}={{ value }}{% if not forloop.last %}&{% endif %}{% endfor %}" class="download-btn" data-vehicle-no="{{ item.id }}">Download</a>
-                      </td> -->
+                      <td>
+                        <div class="custom-dropdowns" data-transaction-id="{{ item.TarnsactionID }}">
+                          <input type="text" class="status-textbox" value="{{ item.Status }}" readonly>
+                          <select class="status-dropdowns" name="status_{{ item.TarnsactionID }}" style="font-family: 'Poppins'">
+                            <option value="1">Not started</option>
+                            <option value="2">Pending</option>
+                            <option value="3">Invoiced</option>
+                            <option value="4">Partial Paid</option>
+                            <option value="5">Paid</option>
+                          </select>
+                        </div>
+                        <button type="button" class="tick-btn" data-transaction-id="{{ item.TarnsactionID }}" onclick="salikupdateStatus(this)">✓</button>
+                      </td>
+                      <td>
+                        <button type="button">Sent</button>
+                      </td>
                   </tr>
                   {% endfor %}
                 </tbody>
             </table>        
       </div>
+    </div>
+    <div class="pagination">
+      <span class="step-links" style="font-family: 'Poppins';font-size: 12px;">
+        {% if salik_data.has_previous %}
+          <a href="?page=1" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">&laquo; first</a>
+          <a href="?page={{ salik_data.previous_page_number }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">previous</a>
+        {% endif %}
+
+        <span class="current" style="font-family: 'Poppins';font-size: 12px;">
+            Page {{ salik_data.number }} of {{ salik_data.paginator.num_pages }}.
+        </span>
+
+        {% if salik_data.has_next %}
+            <a href="?page={{ salik_data.next_page_number }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">next</a>
+            <a href="?page={{ salik_data.paginator.num_pages }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">last &raquo;</a>
+        {% endif %}
+      </span>
     </div>
   </main>
   <div class="fixed-plugin">
@@ -446,6 +476,37 @@
     /* input[type="file"] { */
       /* display: none; */
     /* } */
+
+    .custom-dropdowns {
+  position: relative;
+  display: inline-block;
+}
+
+.status-textbox {
+  background-color: #f2f2f2;
+  border: 1px solid #ccc;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.dropdown-options {
+  position: absolute;
+  z-index: 1;
+  display: none;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.dropdown-options li {
+  padding: 5px;
+}
+
+.dropdown-options li:hover {
+  background-color: #f2f2f2;
+}
   </style>
 
 
@@ -492,7 +553,56 @@
 </script>
 
 
+<script>
+  function salikupdateStatus(button) {
+    var transactionId = button.getAttribute('data-transaction-id'); // Corrected variable name
+    var select = button.parentNode.querySelector('.status-dropdowns');
+    var status = select.options[select.selectedIndex].text;
+    
+    // Get CSRF token from cookies
+    var csrftoken = getCookie('csrftoken');
+    // Send AJAX request to update status
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "/salik_status", true);
+    xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    xhr.setRequestHeader("X-CSRFToken", csrftoken);
+    xhr.onreadystatechange = function() {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                var response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    // Update the status in the table
+                    var statusTextbox = button.parentNode.querySelector('.status-textbox');
+                    statusTextbox.value = status; // Update the value of the status textbox
+                    console.log("Status updated successfully");
+                } else {
+                    console.error("Failed to update status:", response.error);
+                }
+            } else {
+                console.error("Failed to update status. Server returned status:", xhr.status);
+            }
+        }
+    };
+    xhr.send(JSON.stringify({ transactionId: transactionId, status: status }));
+  }
 
+
+  // Function to get CSRF token from cookies
+  function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+      var cookies = document.cookie.split(';');
+      for (var i = 0; i < cookies.length; i++) {
+        var cookie = cookies[i].trim();
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
+        }
+      }
+    }
+    return cookieValue;
+  }
+</script>
 
 
 

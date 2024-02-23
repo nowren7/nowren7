@@ -44,6 +44,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -82,7 +83,7 @@ DATABASES = {
         'PORT':'5432',
         'NAME':'Yaldi',
         'USER':'postgres',
-        'PASSWORD':'123',
+        'PASSWORD':'B33diKutt1@2012',
     }
 }
 
@@ -104,7 +105,9 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
-
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -131,9 +134,7 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# settings.py
-# SUMSUB_API_KEY = 'prd:JRYMCGqQflIgEfnr0GgRoA4A.Im3Kh7TbOJvZmvsG4Le0kIISkiEDl9nZ'
-# SUMSUB_API_SECRET =  'sJ0PJfGVqJGGnXefU0nQgA64ZAZZFrIL'
+
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 MEDIA_URL = '/media/'

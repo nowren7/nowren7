@@ -4,3 +4,135 @@ VEHICLE NO  --- VIEW {SUBSUB DATA AND VEHICLE DETAILS FROM MODELS}
 
 VEHICLE NO --- PDF EDITING WITH SUBSUB DATA
 
+
+# vehilce table excel import format display
+# def upload_file(request):
+#     if request.method == 'POST':
+#         form = ExcelUploadForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             excel_files = form.cleaned_data['file']
+#             df = pd.read_excel(excel_files)
+
+#             vehicle_data = []
+
+#             for index, row in df.iterrows():
+#                 ride_duration_str = str(row['Ride duration'])
+#                 start_date_str = str(row['Start date'])
+#                 end_date_str = str(row['End date'])
+#                 try:
+#                     start_date = datetime.strptime(start_date_str, "%d/%m/%Y %H:%M:%S")
+#                     end_date = datetime.strptime(end_date_str, "%d/%m/%Y %H:%M:%S")
+#                 except ValueError:
+#                     start_date = None
+#                     end_date = None
+
+#                 instance = VehicleDetails(
+#                     Ride_ID=row['ID'],
+#                     Vehicle_No=row['Vehicle No.'],
+#                     Ride_distance=row['Ride distance (km)'],
+#                     Start_date=start_date,
+#                     End_date=end_date,
+#                     Ride_duration=ride_duration_str,
+#                     Total_cost=Decimal(row['Total cost (AED)']),
+#                     UserId=int(row['User ID']),
+#                     User_PhoneNo=row['User phone number']
+#                 )
+#                 instance.save()
+
+#                 vehicle_data.append({
+#                     'Ride_ID': row['ID'],
+#                     'Vehicle_No': row['Vehicle No.'],  # Use Excel column name
+#                     'Ride_distance': row['Ride distance (km)'],  # Use Excel column name
+#                     'Start_date': start_date_str,
+#                     'End_date': end_date_str,
+#                     'Ride_duration': ride_duration_str,
+#                     'Total_cost': Decimal(row['Total cost (AED)']),  # Use Excel column name
+#                     'UserId': row['User ID'],  # Use Excel column name
+#                     'User_PhoneNo': row['User phone number']
+#                 })
+#             print(vehicle_data)
+#             return render(request, 'tables.html', {'form': form, 'vehicle_data': vehicle_data})
+#     else:
+#         existing_data = list(VehicleDetails.objects.values())
+#         form = ExcelUploadForm()
+#         return render(request, 'tables.html', {'form': form, 'vehicle_data': existing_data})
+
+    
+ 
+        # form = ExcelUploadForm()
+        # return render(request, 'tables.html', {'form': form, 'vehicle_data': None})  # Pass None if no data available
+
+
+
+# def salik_Finance(request):
+#     if request.method == 'POST':
+#         form = SalikExcelForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             excel_file = form.cleaned_data['file']
+#             df = pd.read_excel(excel_file)
+
+#             salik_data = []
+
+#             for index, row in df.iterrows():
+#                 trip_date_str = str(row['Trip Date'])
+#                 try:
+#                     trip_date = datetime.strptime(trip_date_str, "%d %b %Y").date()
+#                 except ValueError:
+#                     trip_date = None
+
+#                 trip_time_str = str(row['Trip Time'])
+#                 try:
+#                     trip_time = datetime.strptime(trip_time_str, "%I:%M:%S %p").time()
+#                 except ValueError:
+#                     trip_time = None
+
+#                 transactionID = row['Transaction ID']
+
+#                 plate = str(row['Plate'])
+
+#                 # Step 1: Find matching VehicleDetails
+#                 matching_vehicle = VehicleDetails.objects.filter(Vehicle_No__icontains=plate).first()
+
+#                 if matching_vehicle:
+#                     start_date = matching_vehicle.Start_date.date()
+#                     end_date = matching_vehicle.End_date.date()
+                    
+#                     # Step 2: Check if TripDate is between StartDate and EndDate
+#                     if start_date <= trip_date <= end_date:
+#                         start_time = matching_vehicle.Start_date.time()
+#                         end_time = matching_vehicle.End_date.time()
+                        
+#                         # Step 3: Check if TripTime is between StartTime and EndTime
+#                         if start_time <= trip_time <= end_time:
+#                             amount = row['Amount(AED)']
+#                             if amount != 0:
+#                                 user_id = matching_vehicle.UserId
+#                                 ride_id = matching_vehicle.Ride_ID
+
+#                                 instance = SalikDetails(
+#                                     TarnsactionID=row['Transaction ID'],
+#                                     TripDate=trip_date,
+#                                     TripTime=trip_time,
+#                                     Plate=plate,
+#                                     Ride_ID=ride_id,
+#                                     UserId=user_id,
+#                                     Amount=amount
+#                                 )
+#                                 instance.save()
+
+#                                 salik_data.append({
+#                                     'TarnsactionID': row['Transaction ID'],
+#                                     'TripDate': trip_date,
+#                                     'TripTime': trip_time,
+#                                     'Plate': plate,
+#                                     'Ride_ID': ride_id,
+#                                     'UserId': user_id,
+#                                     'Amount': amount
+#                                 })
+                                                   
+
+#             return render(request, 'salik.html', {'form': form, 'salik_data': salik_data})
+#     else:
+#         salik_data = list(SalikDetails.objects.values())
+#         form = SalikExcelForm()
+#         return render(request, 'salik.html', {'form': form, 'salik_data': salik_data})

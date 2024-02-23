@@ -275,7 +275,25 @@
             </table>        
       </div>
     </div>
+    <div class="pagination">
+      <span class="step-links" style="font-family: 'Poppins';font-size: 12px;">
+          {% if customer_data.has_previous %}
+              <a href="?page=1" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">&laquo; first</a>
+              <a href="?page={{ customer_data.previous_page_number }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">previous</a>
+          {% endif %}
+  
+          <span class="current" style="font-family: 'Poppins';font-size: 12px;">
+              Page {{ customer_data.number }} of {{ customer_data.paginator.num_pages }}.
+          </span>
+  
+          {% if customer_data.has_next %}
+              <a href="?page={{ customer_data.next_page_number }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">next</a>
+              <a href="?page={{ customer_data.paginator.num_pages }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">last &raquo;</a>
+          {% endif %}
+      </span>
+    </div>  
   </main>
+
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
       <i class="material-icons py-2">settings</i>

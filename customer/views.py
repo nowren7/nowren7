@@ -19,12 +19,35 @@ from .utils import sign_request, REQUEST_TIMEOUT
 from django.utils.dateparse import parse_time,parse_date
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import cache_control
+from django.views.decorators.csrf import csrf_exempt
 # ----------------------------------------------------------------------------------------------
+from django.contrib import messages
+
+def login_page(request):
+    username = request.GET.get('uservalue')
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        try:
+            user = UserSaving.objects.get(name=username, password=password)
+            request.session['useraccess']=username
+            return redirect('index')  # Replace 'index' with the appropriate URL name for the user page
+        except UserSaving.DoesNotExist:
+            request.session['useraccess']=None
+            messages.error(request, 'Invalid username or password. Please try again.')
+            return redirect('login')  # Redirect back to the login page with an error message
+    return render(request, 'login.html')
 
 
 # Welcome page
 def index(request):
-    return render(request,'index.html')
+    print(request.session.get('useraccess'))
+    if request.session.get('useraccess'):
+        return render(request,'index.html')
+    else:
+        return redirect('login')
 # customer page vehicle upload
 def ExcelUpload(request):
     from .forms import ExcelUploadForm,CustomerExcelForm
@@ -32,66 +55,12 @@ def ExcelUpload(request):
     form = CustomerExcelForm()
     return render(request,'format.html',{'form':form})
 
-# vehilce table excel import format display
-# def upload_file(request):
-#     if request.method == 'POST':
-#         form = ExcelUploadForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             excel_files = form.cleaned_data['file']
-#             df = pd.read_excel(excel_files)
 
-#             vehicle_data = []
-
-#             for index, row in df.iterrows():
-#                 ride_duration_str = str(row['Ride duration'])
-#                 start_date_str = str(row['Start date'])
-#                 end_date_str = str(row['End date'])
-#                 try:
-#                     start_date = datetime.strptime(start_date_str, "%d/%m/%Y %H:%M:%S")
-#                     end_date = datetime.strptime(end_date_str, "%d/%m/%Y %H:%M:%S")
-#                 except ValueError:
-#                     start_date = None
-#                     end_date = None
-
-#                 instance = VehicleDetails(
-#                     Ride_ID=row['ID'],
-#                     Vehicle_No=row['Vehicle No.'],
-#                     Ride_distance=row['Ride distance (km)'],
-#                     Start_date=start_date,
-#                     End_date=end_date,
-#                     Ride_duration=ride_duration_str,
-#                     Total_cost=Decimal(row['Total cost (AED)']),
-#                     UserId=int(row['User ID']),
-#                     User_PhoneNo=row['User phone number']
-#                 )
-#                 instance.save()
-
-#                 vehicle_data.append({
-#                     'Ride_ID': row['ID'],
-#                     'Vehicle_No': row['Vehicle No.'],  # Use Excel column name
-#                     'Ride_distance': row['Ride distance (km)'],  # Use Excel column name
-#                     'Start_date': start_date_str,
-#                     'End_date': end_date_str,
-#                     'Ride_duration': ride_duration_str,
-#                     'Total_cost': Decimal(row['Total cost (AED)']),  # Use Excel column name
-#                     'UserId': row['User ID'],  # Use Excel column name
-#                     'User_PhoneNo': row['User phone number']
-#                 })
-#             print(vehicle_data)
-#             return render(request, 'tables.html', {'form': form, 'vehicle_data': vehicle_data})
-#     else:
-#         existing_data = list(VehicleDetails.objects.values())
-#         form = ExcelUploadForm()
-#         return render(request, 'tables.html', {'form': form, 'vehicle_data': existing_data})
-
-    
- 
-        # form = ExcelUploadForm()
-        # return render(request, 'tables.html', {'form': form, 'vehicle_data': None})  # Pass None if no data available
 
 
 # vehicle individual download to format
 from django.http import JsonResponse
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 def upload_file_update(request):
     if request.method == 'POST':
@@ -131,7 +100,7 @@ def upload_file_update(request):
                         vehicle_instance.Ride_duration = ride_duration_str
                         vehicle_instance.Total_cost = round(Decimal(row['Total cost (AED)']), 2)
                         vehicle_instance.User_PhoneNo = row['User phone number']
-                        vehicle_instance.Status = request.POST.get(f"status_{id}")  # Save status from dropdown
+                        # vehicle_instance.Status = request.POST.get(f"status_{id}")  # Save status from dropdown
                         vehicle_instance.save()
                     except VehicleDetails.DoesNotExist:
                         # Create new instance
@@ -144,8 +113,8 @@ def upload_file_update(request):
                             Ride_duration=ride_duration_str,
                             Total_cost=Decimal(row['Total cost (AED)']),  # Use Excel column name
                             UserId=user_id,  # Use Excel column name
-                            User_PhoneNo=row['User phone number'],
-                            Status=request.POST.get(f"status_{id}")  # Save status from dropdown
+                            User_PhoneNo=row['User phone number']
+                            # Status=request.POST.get(f"status_{id}")  # Save status from dropdown
                         )
                         instance.save()
 
@@ -158,17 +127,29 @@ def upload_file_update(request):
                         'Ride_duration': ride_duration_str,
                         'Total_cost': round(Decimal(row['Total cost (AED)']), 2),  # Use Excel column name
                         'UserId': user_id,  # Use Excel column name
-                        'User_PhoneNo': row['User phone number'],
-                        'Status': request.POST.get(f"status_{id}")  # Add status to vehicle_data
+                        'User_PhoneNo': row['User phone number']
+                        # 'Status': request.POST.get(f"status_{id}")  # Add status to vehicle_data
                     })
 
             # Returning JsonResponse with the updated data
             return render(request, 'tables.html', {'form': form, 'vehicle_data': vehicle_data})
     else:
         existing_data = list(VehicleDetails.objects.values())
-        # Prepopulate form with existing data for GET requests
-        form = ExcelUploadForm(initial={'vehicle_data': existing_data})
-        return render(request, 'tables.html', {'form': form, 'vehicle_data': existing_data})
+        paginator = Paginator(existing_data, 50)  # Show 50 items per page
+
+        page_number = request.GET.get('page')
+        try:
+            vehicle_data = paginator.page(page_number)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            vehicle_data = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            vehicle_data = paginator.page(paginator.num_pages)
+
+              # Debugging line
+        form = ExcelUploadForm()
+        return render(request, 'tables.html', {'form': form, 'vehicle_data': vehicle_data})
 
 
 
@@ -374,36 +355,51 @@ def customer_upload(request):
                 customer_data = []
 
                 for index, row in df.iterrows():
-                    instance = CustomerDetails(
-                        ID=row['ID'],
-                        name=row['Name'],
-                        email=row['E-mail'],
-                        phonenumber=row['Phone number'],
-                        documentID=row['Document ID']            
-                    )
+                    
+                    
+                        instance = CustomerDetails(
+                            ID=row['ID'],
+                            name=row['Name'],
+                            email=row['E-mail'],
+                            phonenumber=row['Phone number'],
+                            documentID=row['Document ID']            
+                        )
                   
-                    instance.save()
-                    customer_data.append({
-                    'ID': row['ID'],
-                    'name': row['Name'],
-                    'email': row['E-mail'],
-                    'phonenumber': row['Phone number'],
-                    'documentID': row['Document ID'],
-                })
+                        instance.save()
+                        customer_data.append({
+                        'ID': row['ID'],
+                        'name': row['Name'],
+                        'email': row['E-mail'],
+                        'phonenumber': row['Phone number'],
+                        'documentID': row['Document ID'],
+                    })
+            existing_customer_data = list(CustomerDetails.objects.values())
+            print(existing_customer_data)
+            return render(request, 'customer.html', {'form': form, 'customer_data': existing_customer_data})
                     # customer_data = df.to_dict(orient='records')                  
                     # request.session['bulk_upload_identifier'] = df
                     # request.session['bulk_upload_data'] = df.to_dict(orient='records')
                     # Convert lists of dictionaries to DataFrames
          
-            return render(request, 'customer.html',{'form': form, 'customer_data': customer_data})  # Pass the instance to the template
+            # return render(request, 'customer.html',{'form': form, 'customer_data': customer_data})  # Pass the instance to the template
 
     else:
         customer_data = list(CustomerDetails.objects.values())
+        paginator = Paginator(customer_data, 50)  # Show 50 items per page
+
+        page_number = request.GET.get('page')
+        try:
+            customer_data = paginator.page(page_number)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            customer_data = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            customer_data = paginator.page(paginator.num_pages)
+
+            # Debugging line
         form = CustomerExcelForm()
         return render(request, 'customer.html', {'form': form, 'customer_data': customer_data})
-        # form = ExcelUploadForm()
-        # form = CustomerExcelForm()
-        # return render(request, 'customer.html', {'form': form, 'customer_data': None})
 
 #merging two excel values
 def merge_data(request):
@@ -426,6 +422,7 @@ def merge_data(request):
 #salik pageSalik list Yaldi hourly - total.xls
 def salik_Finance(request):
     if request.method == 'POST':
+        print("okkkkkkk")
         form = SalikExcelForm(request.POST, request.FILES)
         if form.is_valid():
             excel_file = form.cleaned_data['file']
@@ -446,51 +443,87 @@ def salik_Finance(request):
                 except ValueError:
                     trip_time = None
 
-                plate = str(row['Plate'])
+                transactionID = row['Transaction ID']
+                if transactionID != '-':
+                    try:
+                        transactionID = int(transactionID)
+                    except ValueError:
+                        transactionID = None
+                    plate = str(row['Plate'])
+                    matching_vehicle = VehicleDetails.objects.filter(Vehicle_No__icontains=plate).first()
+                    if matching_vehicle:
+                        start_date = matching_vehicle.Start_date.date()
+                        end_date = matching_vehicle.End_date.date()
 
-                # Step 1: Find matching VehicleDetails
-                matching_vehicle = VehicleDetails.objects.filter(Vehicle_No__icontains=plate).first()
+                        if start_date <= trip_date <= end_date:
+                            start_time = matching_vehicle.Start_date.time()
+                            end_time = matching_vehicle.End_date.time()
 
-                if matching_vehicle:
-                    start_date = matching_vehicle.Start_date.date()
-                    end_date = matching_vehicle.End_date.date()
-                    
-                    # Step 2: Check if TripDate is between StartDate and EndDate
-                    if start_date <= trip_date <= end_date:
-                        start_time = matching_vehicle.Start_date.time()
-                        end_time = matching_vehicle.End_date.time()
-                        
-                        # Step 3: Check if TripTime is between StartTime and EndTime
-                        if start_time <= trip_time <= end_time:
-                            # If all conditions are met, extract UserId and RideId
-                            user_id = matching_vehicle.UserId
-                            ride_id = matching_vehicle.Ride_ID
+                            if start_time <= trip_time <= end_time:
+                                amount = row['Amount(AED)']
+                                if amount != 0:
+                                    user_id = matching_vehicle.UserId
+                                    ride_id = matching_vehicle.Ride_ID
 
-                            instance = SalikDetails(
-                                TarnsactionID=row['Transaction ID'],
-                                TripDate=trip_date,
-                                TripTime=trip_time,
-                                Plate=plate,
-                                Ride_ID=ride_id,
-                                UserId=user_id
-                            )
-                            instance.save()
+                                    # Check if a SalikDetails object already exists with the given transactionID
+                                    existing_salik_instances = SalikDetails.objects.filter(TarnsactionID=transactionID)
+                                    if existing_salik_instances.exists():
+                                        # Update existing objects
+                                        for salik_instance in existing_salik_instances:
+                                            salik_instance.TripDate = trip_date
+                                            salik_instance.TripTime = trip_time
+                                            salik_instance.Plate = plate
+                                            salik_instance.Ride_ID = ride_id
+                                            salik_instance.UserId = user_id
+                                            salik_instance.Amount = amount
+                                            # salik_instance.Status = request.POST.get(f"status_{id}")  # Save status from dropdown
+                                            salik_instance.save()
+                                    else:
+                                        # Create a new SalikDetails object
+                                        instance = SalikDetails(
+                                            TarnsactionID=transactionID,
+                                            TripDate=trip_date,
+                                            TripTime=trip_time,
+                                            Plate=plate,
+                                            Ride_ID=ride_id,
+                                            UserId=user_id,
+                                            Amount=amount
+                                            # Status=request.POST.get(f"status_{id}")  # Save status from dropdown
+                                        )
+                                        instance.save()
 
-                            salik_data.append({
-                                'TarnsactionID': row['Transaction ID'],
-                                'TripDate': trip_date,
-                                'TripTime': trip_time,
-                                'Plate': plate,
-                                'Ride_ID': ride_id,
-                                'UserId': user_id
-                            })
-                        
-
+                                    salik_data.append({
+                                        'TarnsactionID': transactionID,
+                                        'TripDate': trip_date,
+                                        'TripTime': trip_time,
+                                        'Plate': plate,
+                                        'Ride_ID': ride_id,
+                                        'UserId': user_id,
+                                        'Amount': amount
+                                        # 'Status': request.POST.get(f"status_{id}")  # Add status to vehicle_data
+                                    })
             return render(request, 'salik.html', {'form': form, 'salik_data': salik_data})
     else:
         salik_data = list(SalikDetails.objects.values())
+        paginator = Paginator(salik_data, 50)  # Show 50 items per page
+
+        page_number = request.GET.get('page')
+        try:
+            salik_data = paginator.page(page_number)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            salik_data = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            salik_data = paginator.page(paginator.num_pages)
+
+            # Debugging line
         form = SalikExcelForm()
         return render(request, 'salik.html', {'form': form, 'salik_data': salik_data})
+
+
+
+
     
 
 
@@ -568,52 +601,28 @@ def fines_excel(request):
     else:
         # If the request method is not POST, render the fines.html template with the form and existing fines data
         fines_data = list(FinesDetails.objects.values())
+        paginator = Paginator(fines_data, 50)  # Show 50 items per page
+
+        page_number = request.GET.get('page')
+        try:
+            fines_data = paginator.page(page_number)
+        except PageNotAnInteger:
+            # If page is not an integer, deliver first page.
+            fines_data = paginator.page(1)
+        except EmptyPage:
+            # If page is out of range (e.g. 9999), deliver last page of results.
+            fines_data = paginator.page(paginator.num_pages)
+                  # Debugging line
         form = FinesExcelForm()
         return render(request, 'fines.html', {'form': form, 'fines_data': fines_data})
 
-#userlogin page 
-from django.contrib import messages
 
-def login_page(request):
-    if request.method == 'POST':
-        username = request.POST['username']
-        password = request.POST['password']
-        
-        try:
-            user = UserSaving.objects.get(name=username, password=password)
-            return redirect('index')  # Replace 'index' with the appropriate URL name for the user page
-        except UserSaving.DoesNotExist:
-            messages.error(request, 'Invalid username or password. Please try again.')
-            return redirect('login')  # Redirect back to the login page with an error message
-    
-    return render(request, 'login.html')
- # Assuming your login page is named 'login.html'
-    # status=0
-
-    # if request.method == 'POST':
-
-    #     username = request.POST['user']
-    #     password = request.POST['pass']
-    #     print("user",username)
-    #     # user_obj=User.objects.get(username=username)
-    #     # print(';;;;;;;;',user_obj)
-
-    #     if UserSaving.objects.filter(username=username).filter(password=password).exists():
-    #         # for saving userobject to database
-    #         #User.objects.update_or_create(username=username,password=password,email=email)
-    #         status=1
-    #         print("yes")
-    #     else :
-    #         print("no")
-
-    #     return HttpResponse(status)
-    
-    # return render(request,'Login.html')
 
 #user adding page
 from .models import UserSaving  # Import your User model
 
 def users_adding(request):
+    print(request.session.get('useraccess'))
     if request.method == 'POST':
         form = UserSavingForm(request.POST)
         if form.is_valid():
@@ -643,15 +652,17 @@ def delete_user(request, id):
 
 
 #edit user details
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse
+from .models import UserSaving
 
-def edit_user(request,id):
+def edit_user(request, id):
     if request.method == 'POST':
         user = get_object_or_404(UserSaving, id=id)
         user.name = request.POST.get('name')
         user.email = request.POST.get('email')
         user.role = request.POST.get('role')
+        user.password = request.POST.get('password')
         user.save()
         return JsonResponse({'message': 'User updated successfully'})
     else:
@@ -682,8 +693,63 @@ def update_status(request):
         return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 
+#salik statusviews.py
+def salik_status(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        transaction_id = data.get('transactionId')
+        status = data.get('status')
+        try:
+            # Retrieve the VehicleDetails object with the given user_id
+            vehicle = SalikDetails.objects.get(TarnsactionID=transaction_id)
+            # Update the status
+            vehicle.Status = status
+            vehicle.save()
+            
+            # Return a success response
+            return JsonResponse({'success': True, 'status': status})
+        except VehicleDetails.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Vehicle not found'}, status=404)
+    else:
+        # If the request method is not POST or it's not an AJAX request, return an error response
+        return JsonResponse({'success': False, 'error': 'Invalid request'})
 
-    
+
+#salik statusviews.py
+def fines_status(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        plate_no = data.get('plateno')
+        status = data.get('status')
+        try:
+            # Retrieve the VehicleDetails object with the given user_id
+            vehicle = SalikDetails.objects.get(PlateNo=plate_no)
+            # Update the status
+            vehicle.Status = status
+            vehicle.save()
+            
+            # Return a success response
+            return JsonResponse({'success': True, 'status': status})
+        except VehicleDetails.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Vehicle not found'}, status=404)
+    else:
+        # If the request method is not POST or it's not an AJAX request, return an error response
+        return JsonResponse({'success': False, 'error': 'Invalid request'})
+
+#page spliter views.py   
+# from django.core.paginator import Paginator
+# from django.shortcuts import render
+# from .models import VehicleDetails
+
+# def your_view(request):
+#     vehicle_data = VehicleDetails.objects.all()
+#     print(vehicle_data)
+#     paginator = Paginator(vehicle_data, 50)  # Show 100 items per page
+
+#     page_number = request.GET.get('page')
+#     vehicle_data = paginator.get_page(page_number)
+
+#     return render(request, 'tables.html', {'page_obj': vehicle_data})
 
 
 

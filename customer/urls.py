@@ -1,7 +1,6 @@
 from django.urls import path
 from django.contrib import admin
 from customer import views
-# can you cal in botim
 
 urlpatterns = [
     path('index',views.index,name="index"),
@@ -20,6 +19,8 @@ urlpatterns = [
     path('delete_user/<int:id>/', views.delete_user, name='delete_user'),
     path('edit_user/<int:id>/', views.edit_user, name='edit_user'),
     path('update_status', views.update_status, name='update_status'),
+    path('salik_status', views.salik_status, name='salik_status'),
+    path('fines_status', views.fines_status, name='fines_status'),
     
 
     # path('display_user_table/', views.get_user_data, name='display_user_table'),

@@ -117,15 +117,32 @@
         var username = document.getElementById("username").value;
         var password = document.getElementById("password").value;
 
-        // Send a request to the server to check credentials
-        // You can use fetch or XMLHttpRequest for this purpose
+        // Construct the URL with username as a query parameter
 
-        // For demonstration, let's assume the login is successful
-        // Redirect the user to the users page
-        window.location.href = "/loginpage"; // Replace "/users" with the actual URL of your users page
+        // Send a request to the server to check credentials
+    //     fetch(url, {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json'
+    //         },
+    //         // No need to include the username in the body since it's in the URL
+    //     })
+    //     .then(response => {
+    //         if (!response.ok) {
+    //             throw new Error('Network response was not ok');
+    //         }
+    //         return response.json();
+    //     })
+    //     .then(data => {
+    //         // Request was successful
+    //         console.log(data);
+    //     })
+    //     .catch(error => {
+    //         console.error('There was a problem with the fetch operation:', error);
+    //     });
+    // }
     }
 </script>
-
 <script>
     if (window.history && window.history.pushState) {
         window.history.pushState('', '', window.location.href);

@@ -51,29 +51,29 @@
           </a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle text-white" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                  <i class="material-icons opacity-10">people</i>
-              </div>
-              <span class="nav-link-text ms-1" style="font-family: 'Poppins'">Customers</span>
+          <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="true">
+            <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+              <i class="material-icons opacity-10">people</i>
+            </div>
+            <span class="nav-link-text ms-1" style="font-family: 'Poppins'">Customers</span>
           </a>
           <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li class="nav-item">
-                <a class="nav-link text-white" href="{% url 'customerupload' %}" style="font-family: 'Poppins'">Profiles</a>
+              <a class="nav-link text-white" href="{% url 'customerupload' %}" style="font-family: 'Poppins'">Profiles</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link text-white" href="{% url 'excel_table' %}" style="font-family: 'Poppins'">Rental Contracts</a>
+              <a class="nav-link text-white" href="{% url 'excel_table' %}" style="font-family: 'Poppins'">Rental Contracts</a>
             </li>
           </ul>
         </li>
-      <li class="nav-item dropdown">
-        <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                <i class="material-icons opacity-10">attach_money</i>
+              <i class="material-icons opacity-10">attach_money</i>
             </div>
             <span class="nav-link-text ms-1" style="font-family: 'Poppins'">Finance</span>
-        </a>
-        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
             <li class="nav-item">
                 <a class="nav-link text-white" href="salikurl" style="font-family: 'Poppins'">Salik</a>
             </li>
@@ -86,8 +86,8 @@
             <li class="nav-item">
                 <a class="nav-link text-white" href="{% url 'excel_table' %}" style="font-family: 'Poppins'">Invoices</a>
             </li>
-        </ul>
-      </li>
+          </ul>
+        </li>
     
         <li class="nav-item">
           <a class="nav-link text-white " href="./pages/virtual-reality.html">
@@ -281,7 +281,7 @@
               <td>
                 <div class="custom-dropdowns" data-user-id="{{ item.UserId }}">
                   <input type="text" class="status-textbox" value="{{ item.Status }}" readonly>
-                  <select class="status-dropdowns" name="status_{{ item.UserId }}">
+                  <select class="status-dropdowns" name="status_{{ item.UserId }}" style="font-family: 'Poppins'">
                     <option value="1">Not started</option>
                     <option value="2">Pending</option>
                     <option value="3">Under process</option>
@@ -300,7 +300,24 @@
         </table>                
       </div>
     </div>
-  </main>
+    <div class="pagination">
+      <span class="step-links" style="font-family: 'Poppins';font-size: 12px;">
+        {% if vehicle_data.has_previous %}
+          <a href="?page=1" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">&laquo; first</a>
+          <a href="?page={{ vehicle_data.previous_page_number }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">previous</a>
+        {% endif %}
+
+        <span class="current" style="font-family: 'Poppins';font-size: 12px;">
+            Page {{ vehicle_data.number }} of {{ vehicle_data.paginator.num_pages }}.
+        </span>
+
+        {% if vehicle_data.has_next %}
+            <a href="?page={{ vehicle_data.next_page_number }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">next</a>
+            <a href="?page={{ vehicle_data.paginator.num_pages }}" class="btn btn-primary btn-sm" style="font-family: 'Poppins';font-size: 12px;">last &raquo;</a>
+        {% endif %}
+      </span>
+  </div>  
+</main>
   <div class="fixed-plugin">
     <a class="fixed-plugin-button text-dark position-fixed px-3 py-2">
       <i class="material-icons py-2">settings</i>
@@ -468,7 +485,6 @@
       /* display: none; */
     /* } */
 
-
     .custom-dropdowns {
   position: relative;
   display: inline-block;
@@ -499,9 +515,7 @@
 .dropdown-options li:hover {
   background-color: #f2f2f2;
 }
-
-
-</style>
+  </style>
 
 
 
@@ -548,7 +562,7 @@
   async function fetchExcelData() {
       try {
           // Replace 'your-api-endpoint' with the actual endpoint that serves the Excel data in JSON format
-          const response = await fetch('ExcelUpload');
+          const response = await fetch('exceltable');
           const data = await response.json();
 
           // Call the function to populate the table with the fetched data
@@ -561,7 +575,7 @@
   // Function to populate the table with data
   function populateTable(data) {
       // Get the table element
-      var table = document.getElementById("ExcelUpload");
+      var table = document.getElementById("exceltable");
 
       // Clear existing rows in the table body
       table.tBodies[0].innerHTML = '';
@@ -582,7 +596,6 @@
   window.onload = function () {
       fetchExcelData();
   };
-
 </script>
 
 
@@ -677,14 +690,32 @@
 
 
   
+<!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script> -->
 
-<script>
+<!-- <script>
   // Initialize Bootstrap dropdown
   $(document).ready(function() {
     $('.dropdown-toggle').dropdown();
   });
-</script>
+</script> -->
 
+<script src="{% static 'js/core/popper.min.js'%}"></script>
+  <script src="{% static 'js/core/bootstrap.min.js'%}"></script>
+  <script src="{% static 'js/plugins/perfect-scrollbar.min.js'%}"></script>
+  <script src="{% static 'js/plugins/smooth-scrollbar.min.js'%}"></script>
+  <script>
+    var win = navigator.platform.indexOf('Win') > -1;
+    if (win && document.querySelector('#sidenav-scrollbar')) {
+      var options = {
+        damping: '0.5'
+      }
+      Scrollbar.init(document.querySelector('#sidenav-scrollbar'), options);
+    }
+  </script>
+  <!-- Github buttons -->
+  <script async defer src="https://buttons.github.io/buttons.js"></script>
+  <!-- Control Center for Material Dashboard: parallax effects, scripts for the example pages etc -->
+  <script src="{% static 'js/material-dashboard.min.js'%}"></script>
 
   <style>
     .dropdown-menu {
