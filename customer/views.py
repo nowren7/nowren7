@@ -38,7 +38,7 @@ def login_page(request):
             request.session['useraccess']=None
             messages.error(request, 'Invalid username or password. Please try again.')
             return redirect('login')  # Redirect back to the login page with an error message
-    return render(request, 'login.html')
+    return render(request, 'Login.html')
 
 
 # Welcome page
@@ -134,7 +134,8 @@ def upload_file_update(request):
             # Returning JsonResponse with the updated data
             return render(request, 'tables.html', {'form': form, 'vehicle_data': vehicle_data})
     else:
-        existing_data = list(VehicleDetails.objects.values())
+        existing_data = VehicleDetails.objects.order_by('-Ride_ID').values()
+
         paginator = Paginator(existing_data, 50)  # Show 50 items per page
 
         page_number = request.GET.get('page')
@@ -147,7 +148,7 @@ def upload_file_update(request):
             # If page is out of range (e.g. 9999), deliver last page of results.
             vehicle_data = paginator.page(paginator.num_pages)
 
-              # Debugging line
+        # Debugging line
         form = ExcelUploadForm()
         return render(request, 'tables.html', {'form': form, 'vehicle_data': vehicle_data})
 
@@ -384,7 +385,8 @@ def customer_upload(request):
             # return render(request, 'customer.html',{'form': form, 'customer_data': customer_data})  # Pass the instance to the template
 
     else:
-        customer_data = list(CustomerDetails.objects.values())
+        customer_data = CustomerDetails.objects.order_by('-ID').values()
+
         paginator = Paginator(customer_data, 50)  # Show 50 items per page
 
         page_number = request.GET.get('page')
@@ -397,7 +399,6 @@ def customer_upload(request):
             # If page is out of range (e.g. 9999), deliver last page of results.
             customer_data = paginator.page(paginator.num_pages)
 
-            # Debugging line
         form = CustomerExcelForm()
         return render(request, 'customer.html', {'form': form, 'customer_data': customer_data})
 
@@ -422,7 +423,6 @@ def merge_data(request):
 #salik pageSalik list Yaldi hourly - total.xls
 def salik_Finance(request):
     if request.method == 'POST':
-        print("okkkkkkk")
         form = SalikExcelForm(request.POST, request.FILES)
         if form.is_valid():
             excel_file = form.cleaned_data['file']
@@ -451,6 +451,7 @@ def salik_Finance(request):
                         transactionID = None
                     plate = str(row['Plate'])
                     matching_vehicle = VehicleDetails.objects.filter(Vehicle_No__icontains=plate).first()
+                    print(matching_vehicle)
                     if matching_vehicle:
                         start_date = matching_vehicle.Start_date.date()
                         end_date = matching_vehicle.End_date.date()
@@ -504,7 +505,8 @@ def salik_Finance(request):
                                     })
             return render(request, 'salik.html', {'form': form, 'salik_data': salik_data})
     else:
-        salik_data = list(SalikDetails.objects.values())
+        salik_data = SalikDetails.objects.order_by('-TarnsactionID').values()
+
         paginator = Paginator(salik_data, 50)  # Show 50 items per page
 
         page_number = request.GET.get('page')
@@ -517,7 +519,6 @@ def salik_Finance(request):
             # If page is out of range (e.g. 9999), deliver last page of results.
             salik_data = paginator.page(paginator.num_pages)
 
-            # Debugging line
         form = SalikExcelForm()
         return render(request, 'salik.html', {'form': form, 'salik_data': salik_data})
 
@@ -546,18 +547,19 @@ def fines_excel(request):
                         ticket_date = None
                 else:
                     ticket_date = None
-                
+
                 ticket_time_str = str(row['Ticket Time'])
                 try:
                     ticket_time = datetime.strptime(ticket_time_str, "%I:%M %p").time()
                 except ValueError:
                     ticket_time = None
+                  
 
                 plate_no = str(row['Plate Number'])
-
+                
                 # Find matching vehicle details based on Plate Number
                 matching_vehicle = VehicleDetails.objects.filter(Vehicle_No__icontains=plate_no).first()
-
+                print(matching_vehicle)
                 if matching_vehicle:
                     start_date = matching_vehicle.Start_date.date()
                     end_date = matching_vehicle.End_date.date()
@@ -572,7 +574,7 @@ def fines_excel(request):
                         if start_time <= ticket_time <= end_time:
 
                             ride_id = matching_vehicle.Ride_ID
-                            print(ride_id)
+                            # print(ride_id)
                             # Save data to FinesDetails model
                             instance = FinesDetails(
                                 PlateNo=plate_no,
@@ -600,7 +602,7 @@ def fines_excel(request):
             return render(request, 'fines.html', {'form': form, 'fines_data': fines_data})
     else:
         # If the request method is not POST, render the fines.html template with the form and existing fines data
-        fines_data = list(FinesDetails.objects.values())
+        fines_data = list(FinesDetails.objects.order_by('-PlateNo').values())
         paginator = Paginator(fines_data, 50)  # Show 50 items per page
 
         page_number = request.GET.get('page')
