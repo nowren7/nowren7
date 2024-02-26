@@ -38,7 +38,7 @@ def login_page(request):
             request.session['useraccess']=None
             messages.error(request, 'Invalid username or password. Please try again.')
             return redirect('login')  # Redirect back to the login page with an error message
-    return render(request, 'Login.html')
+    return render(request, 'login.html')
 
 
 # Welcome page
