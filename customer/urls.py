@@ -21,6 +21,7 @@ urlpatterns = [
     path('update_status', views.update_status, name='update_status'),
     path('salik_status', views.salik_status, name='salik_status'),
     path('fines_status', views.fines_status, name='fines_status'),
+    path('generate-csv/', views.generate_csv, name='generate_csv'),
     
 
     # path('display_user_table/', views.get_user_data, name='display_user_table'),

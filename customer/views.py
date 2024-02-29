@@ -738,20 +738,28 @@ def fines_status(request):
         # If the request method is not POST or it's not an AJAX request, return an error response
         return JsonResponse({'success': False, 'error': 'Invalid request'})
 
-#page spliter views.py   
-# from django.core.paginator import Paginator
-# from django.shortcuts import render
-# from .models import VehicleDetails
 
-# def your_view(request):
-#     vehicle_data = VehicleDetails.objects.all()
-#     print(vehicle_data)
-#     paginator = Paginator(vehicle_data, 50)  # Show 100 items per page
+#excel file export button
+import csv
+from django.http import HttpResponse
 
-#     page_number = request.GET.get('page')
-#     vehicle_data = paginator.get_page(page_number)
 
-#     return render(request, 'tables.html', {'page_obj': vehicle_data})
+def generate_csv(request):
+    # Retrieve data from the database
+    data = VehicleDetails.objects.all()
+
+    # Prepare the response as CSV
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="vehicle_data.csv"'
+
+    # Write data to CSV file
+    writer = csv.writer(response)
+    writer.writerow(['Start Time', 'End Time', 'Plate No', 'Ride Duration', 'Ride Distance'])
+
+    for item in data:
+        writer.writerow([item.start_time, item.end_time, item.plate_no, item.ride_duration, item.ride_distance])
+
+    return response
 
 
 
