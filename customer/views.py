@@ -22,8 +22,10 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.cache import cache_control
 from django.views.decorators.csrf import csrf_exempt
-# ----------------------------------------------------------------------------------------------
 from django.contrib import messages
+from datetime import datetime
+# ----------------------------------------------------------------------------------------------
+
 
 def login_page(request):
     username = request.GET.get('uservalue')
@@ -58,9 +60,12 @@ def ExcelUpload(request):
 
 
 
-# vehicle individual download to format
+# vehicle individual upload to format
 from django.http import JsonResponse
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+
+import datetime  # Import the datetime module
 
 def upload_file_update(request):
     if request.method == 'POST':
@@ -76,8 +81,8 @@ def upload_file_update(request):
                 start_date_str = str(row['Start date'])
                 end_date_str = str(row['End date'])
                 try:
-                    start_date = datetime.strptime(start_date_str, "%d/%m/%Y %H:%M:%S")
-                    end_date = datetime.strptime(end_date_str, "%d/%m/%Y %H:%M:%S")
+                    start_date = datetime.datetime.strptime(start_date_str, "%d/%m/%Y %H:%M:%S")  # Use datetime.datetime.strptime()
+                    end_date = datetime.datetime.strptime(end_date_str, "%d/%m/%Y %H:%M:%S")  # Use datetime.datetime.strptime()
                 except ValueError:
                     start_date = None
                     end_date = None
@@ -100,6 +105,12 @@ def upload_file_update(request):
                         vehicle_instance.Ride_duration = ride_duration_str
                         vehicle_instance.Total_cost = round(Decimal(row['Total cost (AED)']), 2)
                         vehicle_instance.User_PhoneNo = row['User phone number']
+                        vehicle_instance.VehiclemodelID = row['Vehicle model ID']
+                        vehicle_instance.Vehiclestartlatitude = row['Vehicle start latitude']
+                        vehicle_instance.Vehiclestartlongitude = row['Vehicle start longitude']
+                        vehicle_instance.Vehicleendlatitude = row['Vehicle end latitude']
+                        vehicle_instance.Vehicleendlongitude = row['Vehicle end longitude']
+                        
                         # vehicle_instance.Status = request.POST.get(f"status_{id}")  # Save status from dropdown
                         vehicle_instance.save()
                     except VehicleDetails.DoesNotExist:
@@ -113,7 +124,13 @@ def upload_file_update(request):
                             Ride_duration=ride_duration_str,
                             Total_cost=Decimal(row['Total cost (AED)']),  # Use Excel column name
                             UserId=user_id,  # Use Excel column name
-                            User_PhoneNo=row['User phone number']
+                            User_PhoneNo=row['User phone number'],
+                            VehiclemodelID = row['Vehicle model ID'],
+                            Vehiclestartlatitude = row['Vehicle start latitude'],
+                            Vehiclestartlongitude = row['Vehicle start longitude'],
+                            Vehicleendlatitude = row['Vehicle end latitude'],
+                            Vehicleendlongitude = row['Vehicle end longitude']
+                        
                             # Status=request.POST.get(f"status_{id}")  # Save status from dropdown
                         )
                         instance.save()
@@ -151,6 +168,7 @@ def upload_file_update(request):
         # Debugging line
         form = ExcelUploadForm()
         return render(request, 'tables.html', {'form': form, 'vehicle_data': vehicle_data})
+
 
 
 
@@ -740,26 +758,122 @@ def fines_status(request):
 
 
 #excel file export button
+import json
 import csv
+import requests
 from django.http import HttpResponse
-
+from django.utils import timezone
+from .models import VehicleDetails
 
 def generate_csv(request):
     # Retrieve data from the database
-    data = VehicleDetails.objects.all()
+    vehicle_details = VehicleDetails.objects.all()
 
     # Prepare the response as CSV
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="vehicle_data.csv"'
 
-    # Write data to CSV file
-    writer = csv.writer(response)
-    writer.writerow(['Start Time', 'End Time', 'Plate No', 'Ride Duration', 'Ride Distance'])
+    # Define the CSV column names
+    csv_columns = [
+        'Trip ID', 'VIN', 'VRN', 'Transport Operator Name', 'Driver Permit Number',
+        'Driver Permit Type', 'Driver License Number', 'Start Time (UTC)', 'Start Position Latitude',
+        'Start Position Longitude','End Time (UTC)','End Position Latitude','End Position Longitude',
+        'Start Position Name','Planned Destination Name','Book Channel','Book Time (UTC)',
+        'Trip Time (Seconds)','Status','Payment Type','Reason','Distance (Meters)',
+        'Fare Amount','Start Fare','Fare Distance Charge','Fare Time Charge','Tollways',
+        'Fare Extra','Fare Tax','Fare Tips','Fare Rate','Fare Unit','Booking Fee',
+        'Waiting Fee','Promotion-Code','Promotion-Type','Promotion Amount','City-Change-Charge',
+        'City-Change-Code','Fix-Charge'
+    ]
 
-    for item in data:
-        writer.writerow([item.start_time, item.end_time, item.plate_no, item.ride_duration, item.ride_distance])
+    # Write data to CSV file
+    writer = csv.DictWriter(response, fieldnames=csv_columns)
+    writer.writeheader()
+
+    for vehicle in vehicle_details:
+        try:
+            # Fetch SumSub data for the user ID associated with the vehicle
+            customer_sumsub = vehicle.UserId  # Assuming UserId represents the SumSub ID
+            SUMSUB_TEST_BASE_URL = "https://api.sumsub.com"
+            url = f"{SUMSUB_TEST_BASE_URL}/resources/applicants/{customer_sumsub}/one"
+            resp = requests.get(url)  # Send GET request to SumSub API
+            if resp.status_code == 200:  # Check if request is successful
+                response_data = resp.json()  # Parse response JSON
+                # Initialize variables
+                driver_license_number = ''
+                # Iterate through idDocs
+                for id_doc in response_data.get('info', {}).get('idDocs', []):
+                    doc_type = id_doc.get('idDocType', '')
+                    if doc_type == 'DRIVERS':
+                        # Driver’s License
+                        driver_license_number = id_doc.get('number', '')
+                        break  # Exit the loop once driver's license number is found
+
+                # Convert start and end time to UTC format using timezone
+                start_time_utc = vehicle.Start_date.astimezone(timezone.utc)
+                end_time_utc = vehicle.End_date.astimezone(timezone.utc)
+            
+                # Convert ride duration to seconds
+                ride_duration_seconds = vehicle.Ride_duration.total_seconds()
+
+                writer.writerow({
+                    'Trip ID': vehicle.Ride_ID,
+                    'VIN': '',  
+                    'VRN': vehicle.Vehicle_No,
+                    'Transport Operator Name': 'YALDI HOURLY CAR RENTAL L.L.C',
+                    'Driver Permit Number': '',
+                    'Driver Permit Type': '',
+                    'Driver License Number': driver_license_number,
+                    'Start Time (UTC)': start_time_utc,
+                    'Start Position Latitude' : vehicle.Vehiclestartlatitude,
+                    'Start Position Longitude': vehicle.Vehiclestartlongitude,
+                    'End Time (UTC)': end_time_utc,
+                    'End Position Latitude': vehicle.Vehicleendlatitude,
+                    'End Position Longitude': vehicle.Vehicleendlongitude,
+                    'Start Position Name': '',
+                    'Planned Destination Name': '',
+                    'Book Channel': 'others',
+                    'Book Time (UTC)': start_time_utc.date().strftime("%Y-%m-%d"),  # Date portion of start time in UTC
+                    'Trip Time (Seconds)': ride_duration_seconds,  # Ride duration in seconds
+                    'Status': 'FINISHED',
+                    'Payment Type': '',
+                    'Reason': '',
+                    'Distance (Meters)': vehicle.Ride_distance * 1000,  # Distance in meters
+                    'Fare Amount': vehicle.Total_cost,
+                    'Start Fare': '',
+                    'Fare Distance Charge': '',
+                    'Fare Time Charge': '',
+                    'Tollways': '',
+                    'Fare Extra': '',
+                    'Fare Tax': '',
+                    'Fare Tips': '',
+                    'Fare Rate': '',
+                    'Fare Unit': '',
+                    'Booking Fee': '',
+                    'Waiting Fee': '',
+                    'Promotion-Code': '',
+                    'Promotion-Type': '',
+                    'Promotion Amount': '',
+                    'City-Change-Charge': '',
+                    'City-Change-Code': '',
+                    'Fix-Charge': ''
+                })
+            else:
+                # Handle API request failure gracefully
+                print(f"Failed to fetch SumSub data for UserId: {customer_sumsub}")
+        except Exception as e:
+            print(f"Error processing vehicle: {vehicle.id}, Error: {str(e)}")
 
     return response
+
+
+
+
+
+
+
+
+
 
 
 

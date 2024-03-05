@@ -21,6 +21,12 @@ class VehicleDetails(models.Model):
     Ride_ID = models.CharField(max_length=60)
     User_PhoneNo = models.CharField(max_length=100)
     Status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='')
+    VehiclemodelID = models.CharField(max_length=100)
+    Vehiclestartlatitude = models.CharField(max_length=100)
+    Vehiclestartlongitude = models.CharField(max_length=100)
+    Vehicleendlatitude = models.CharField(max_length=100)
+    Vehicleendlongitude = models.CharField(max_length=100)
+    Userphonenumber = models.CharField(max_length=100)
 
     class Meta:
         verbose_name = 'Vehicle'
