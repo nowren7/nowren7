@@ -767,7 +767,9 @@ from .models import VehicleDetails
 
 def generate_csv(request):
     # Retrieve data from the database
+    userid = request.GET.get('UserId')
     vehicle_details = VehicleDetails.objects.all()
+    
 
     # Prepare the response as CSV
     response = HttpResponse(content_type='text/csv')
@@ -790,13 +792,16 @@ def generate_csv(request):
     writer = csv.DictWriter(response, fieldnames=csv_columns)
     writer.writeheader()
 
+    
     for vehicle in vehicle_details:
         try:
-            # Fetch SumSub data for the user ID associated with the vehicle
-            customer_sumsub = vehicle.UserId  # Assuming UserId represents the SumSub ID
+            customer_id = CustomerDetails.objects.get(ID=userid)
+            customer_sumsub = customer_id.documentID
+            print(customer_sumsub)
             SUMSUB_TEST_BASE_URL = "https://api.sumsub.com"
             url = f"{SUMSUB_TEST_BASE_URL}/resources/applicants/{customer_sumsub}/one"
-            resp = requests.get(url)  # Send GET request to SumSub API
+            resp = requests.get(url)
+        
             if resp.status_code == 200:  # Check if request is successful
                 response_data = resp.json()  # Parse response JSON
                 # Initialize variables
@@ -860,11 +865,14 @@ def generate_csv(request):
                 })
             else:
                 # Handle API request failure gracefully
-                print(f"Failed to fetch SumSub data for UserId: {customer_sumsub}")
+                print(f"Failed to fetch SUMSUB data for UserId: {vehicle.UserId}")
+        except CustomerDetails.DoesNotExist:
+            print(f"CustomerDetails not found for UserId: {vehicle.UserId}")
         except Exception as e:
             print(f"Error processing vehicle: {vehicle.id}, Error: {str(e)}")
 
     return response
+
 
 
 
