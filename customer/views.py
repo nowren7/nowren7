@@ -799,7 +799,8 @@ def generate_csv(request):
             customer_sumsub = customer_id.documentID
             print(customer_sumsub)
             SUMSUB_TEST_BASE_URL = "https://api.sumsub.com"
-            url = f"{SUMSUB_TEST_BASE_URL}/resources/applicants/{customer_sumsub}/one"
+            id=customer_sumsub
+            url = f"{SUMSUB_TEST_BASE_URL}/resources/applicants/{id}/one"
             resp = requests.get(url)
         
             if resp.status_code == 200:  # Check if request is successful
