@@ -257,7 +257,7 @@ def download_form(request):
              
     # print(customer_phone_number)
     try:
-        customer_id = CustomerDetails.objects.get(ID=userid)
+        customer_id = CustomerDetails.objects.get(Customer_ID=userid)
     except CustomerDetails.DoesNotExist:
         messages.error(request,"Customer Does not exist")
         return render(request,'ppmcontract.html')
@@ -277,12 +277,11 @@ def download_form(request):
     s = requests.Session()
     response = s.send(resp, timeout=REQUEST_TIMEOUT)
     response_data = json.loads(response.text)
+
     customer_name = response_data.get('info', {}).get('firstName', '')
     customer_Dob = response_data.get('info', {}).get('dob', '')
     # customer_mobile = response_data.get('info',[{}]).get('')
     customer_nationality = response_data.get('info',{}).get('nationality','')
-      
-
     # Initialize variables
     driver_license_number = ''
     driver_country_of_issue = ''
@@ -306,6 +305,22 @@ def download_form(request):
             emirates_id_passport_number = id_doc.get('additionalNumber', '')
             emirates_id_passport_date_of_issue = id_doc.get('issuedDate', '')
             emirates_id_passport_date_of_expiry = id_doc.get('validUntil', '')
+    try:
+        print(customer_id)
+        customer_id.name = customer_name
+        customer_id.Dob = customer_Dob
+        customer_id.nationality = customer_nationality
+        customer_id.driver_license_number = driver_license_number
+        customer_id.driver_country_of_issue = driver_country_of_issue
+        customer_id.driver_date_of_issue = driver_date_of_issue
+        customer_id.driver_date_of_expiry = driver_date_of_expiry
+        customer_id.emirates_id_passport_number = emirates_id_passport_number
+        customer_id.emirates_id_passport_date_of_issue = emirates_id_passport_date_of_issue
+        customer_id.emirates_id_passport_date_of_expiry = emirates_id_passport_date_of_expiry
+        customer_id.save()
+        print("saved")
+    except Exception as e:
+        print(f"error as {e}")
 
 
     customer = {
@@ -377,7 +392,7 @@ def customer_upload(request):
                     
                     
                         instance = CustomerDetails(
-                            ID=row['ID'],
+                            Customer_ID=row['ID'],
                             name=row['Name'],
                             email=row['E-mail'],
                             phonenumber=row['Phone number'],
@@ -386,7 +401,7 @@ def customer_upload(request):
                   
                         instance.save()
                         customer_data.append({
-                        'ID': row['ID'],
+                        'Customer_ID': row['ID'],
                         'name': row['Name'],
                         'email': row['E-mail'],
                         'phonenumber': row['Phone number'],
@@ -403,7 +418,7 @@ def customer_upload(request):
             # return render(request, 'customer.html',{'form': form, 'customer_data': customer_data})  # Pass the instance to the template
 
     else:
-        customer_data = CustomerDetails.objects.order_by('-ID').values()
+        customer_data = CustomerDetails.objects.order_by('-Customer_ID').values()
 
         paginator = Paginator(customer_data, 50)  # Show 50 items per page
 
@@ -773,7 +788,7 @@ def generate_csv(request):
 
     # Prepare the response as CSV
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="vehicle_data.csv"'
+    response['Content-Disposition'] = 'attachment; filename="vehicle_datafile.csv"'
 
     # Define the CSV column names
     csv_columns = [
@@ -794,83 +809,141 @@ def generate_csv(request):
 
     
     for vehicle in vehicle_details:
-        try:
-            customer_id = CustomerDetails.objects.get(ID=userid)
-            customer_sumsub = customer_id.documentID
-            print(customer_sumsub)
-            SUMSUB_TEST_BASE_URL = "https://api.sumsub.com"
-            id=customer_sumsub
-            url = f"{SUMSUB_TEST_BASE_URL}/resources/applicants/{id}/one"
-            resp = requests.get(url)
-        
-            if resp.status_code == 200:  # Check if request is successful
-                response_data = resp.json()  # Parse response JSON
-                # Initialize variables
-                driver_license_number = ''
-                # Iterate through idDocs
-                for id_doc in response_data.get('info', {}).get('idDocs', []):
-                    doc_type = id_doc.get('idDocType', '')
-                    if doc_type == 'DRIVERS':
-                        # Driver’s License
-                        driver_license_number = id_doc.get('number', '')
-                        break  # Exit the loop once driver's license number is found
-
-                # Convert start and end time to UTC format using timezone
+        customers = CustomerDetails.objects.filter(Customer_ID=vehicle.UserId)
+        # print("Customer Details for Vehicle ID:", vehicle.UserId)
+        # print("Start:",vehicle.Start_date)
+        # print("End:",vehicle.End_date)
+        difference = vehicle.End_date-vehicle.Start_date
+        # print("Difference:",difference)
+        if difference <= timedelta(hours=24):
+            for customer in customers:
                 start_time_utc = vehicle.Start_date.astimezone(timezone.utc)
                 end_time_utc = vehicle.End_date.astimezone(timezone.utc)
-            
-                # Convert ride duration to seconds
+            # Convert ride duration to seconds
                 ride_duration_seconds = vehicle.Ride_duration.total_seconds()
-
                 writer.writerow({
-                    'Trip ID': vehicle.Ride_ID,
-                    'VIN': '',  
-                    'VRN': vehicle.Vehicle_No,
-                    'Transport Operator Name': 'YALDI HOURLY CAR RENTAL L.L.C',
-                    'Driver Permit Number': '',
-                    'Driver Permit Type': '',
-                    'Driver License Number': driver_license_number,
-                    'Start Time (UTC)': start_time_utc,
-                    'Start Position Latitude' : vehicle.Vehiclestartlatitude,
-                    'Start Position Longitude': vehicle.Vehiclestartlongitude,
-                    'End Time (UTC)': end_time_utc,
-                    'End Position Latitude': vehicle.Vehicleendlatitude,
-                    'End Position Longitude': vehicle.Vehicleendlongitude,
-                    'Start Position Name': '',
-                    'Planned Destination Name': '',
-                    'Book Channel': 'others',
-                    'Book Time (UTC)': start_time_utc.date().strftime("%Y-%m-%d"),  # Date portion of start time in UTC
-                    'Trip Time (Seconds)': ride_duration_seconds,  # Ride duration in seconds
-                    'Status': 'FINISHED',
-                    'Payment Type': '',
-                    'Reason': '',
-                    'Distance (Meters)': vehicle.Ride_distance * 1000,  # Distance in meters
-                    'Fare Amount': vehicle.Total_cost,
-                    'Start Fare': '',
-                    'Fare Distance Charge': '',
-                    'Fare Time Charge': '',
-                    'Tollways': '',
-                    'Fare Extra': '',
-                    'Fare Tax': '',
-                    'Fare Tips': '',
-                    'Fare Rate': '',
-                    'Fare Unit': '',
-                    'Booking Fee': '',
-                    'Waiting Fee': '',
-                    'Promotion-Code': '',
-                    'Promotion-Type': '',
-                    'Promotion Amount': '',
-                    'City-Change-Charge': '',
-                    'City-Change-Code': '',
-                    'Fix-Charge': ''
-                })
-            else:
-                # Handle API request failure gracefully
-                print(f"Failed to fetch SUMSUB data for UserId: {vehicle.UserId}")
-        except CustomerDetails.DoesNotExist:
-            print(f"CustomerDetails not found for UserId: {vehicle.UserId}")
-        except Exception as e:
-            print(f"Error processing vehicle: {vehicle.id}, Error: {str(e)}")
+                        'Trip ID': vehicle.Ride_ID,
+                        'VIN': '',  
+                        'VRN': vehicle.Vehicle_No,
+                        'Transport Operator Name': 'YALDI HOURLY CAR RENTAL L.L.C',
+                        'Driver Permit Number': '',
+                        'Driver Permit Type': '',
+                        'Driver License Number': customer.driver_license_number,
+                        'Start Time (UTC)': start_time_utc,
+                        'Start Position Latitude' : vehicle.Vehiclestartlatitude,
+                        'Start Position Longitude': vehicle.Vehiclestartlongitude,
+                        'End Time (UTC)': end_time_utc,
+                        'End Position Latitude': vehicle.Vehicleendlatitude,
+                        'End Position Longitude': vehicle.Vehicleendlongitude,
+                        'Start Position Name': '',
+                        'Planned Destination Name': '',
+                        'Book Channel': 'others',
+                        'Book Time (UTC)': start_time_utc.date().strftime("%Y-%m-%d"),  # Date portion of start time in UTC
+                        'Trip Time (Seconds)': ride_duration_seconds,  # Ride duration in seconds
+                        'Status': 'FINISHED',
+                        'Payment Type': '',
+                        'Reason': '',
+                        'Distance (Meters)': vehicle.Ride_distance * 1000,  # Distance in meters
+                        'Fare Amount': vehicle.Total_cost,
+                        'Start Fare': '',
+                        'Fare Distance Charge': '',
+                        'Fare Time Charge': '',
+                        'Tollways': '',
+                        'Fare Extra': '',
+                        'Fare Tax': '',
+                        'Fare Tips': '',
+                        'Fare Rate': '',
+                        'Fare Unit': '',
+                        'Booking Fee': '',
+                        'Waiting Fee': '',
+                        'Promotion-Code': '',
+                        'Promotion-Type': '',
+                        'Promotion Amount': '',
+                        'City-Change-Charge': '',
+                        'City-Change-Code': '',
+                        'Fix-Charge': ''
+                    })
+        else:
+            print(f"more than 24 hourse {vehicle.UserId}")
+            continue
+        
+        # try:
+        #     customer_id = CustomerDetails.objects.get(ID=userid)
+        #     customer_sumsub = customer_id.documentID
+        #     print(customer_sumsub)
+        #     SUMSUB_TEST_BASE_URL = "https://api.sumsub.com"
+        #     id=customer_sumsub
+        #     url = f"{SUMSUB_TEST_BASE_URL}/resources/applicants/{id}/one"
+        #     resp = requests.get(url)
+        
+        #     if resp.status_code == 200:  # Check if request is successful
+        #         response_data = resp.json()  # Parse response JSON
+        #         # Initialize variables
+        #         driver_license_number = ''
+        #         # Iterate through idDocs
+        #         for id_doc in response_data.get('info', {}).get('idDocs', []):
+        #             doc_type = id_doc.get('idDocType', '')
+        #             if doc_type == 'DRIVERS':
+        #                 # Driver’s License
+        #                 driver_license_number = id_doc.get('number', '')
+        #                 break  # Exit the loop once driver's license number is found
+
+        #         # Convert start and end time to UTC format using timezone
+        #         start_time_utc = vehicle.Start_date.astimezone(timezone.utc)
+        #         end_time_utc = vehicle.End_date.astimezone(timezone.utc)
+            
+        #         # Convert ride duration to seconds
+        #         ride_duration_seconds = vehicle.Ride_duration.total_seconds()
+
+        #         writer.writerow({
+        #             'Trip ID': vehicle.Ride_ID,
+        #             'VIN': '',  
+        #             'VRN': vehicle.Vehicle_No,
+        #             'Transport Operator Name': 'YALDI HOURLY CAR RENTAL L.L.C',
+        #             'Driver Permit Number': '',
+        #             'Driver Permit Type': '',
+        #             'Driver License Number': driver_license_number,
+        #             'Start Time (UTC)': start_time_utc,
+        #             'Start Position Latitude' : vehicle.Vehiclestartlatitude,
+        #             'Start Position Longitude': vehicle.Vehiclestartlongitude,
+        #             'End Time (UTC)': end_time_utc,
+        #             'End Position Latitude': vehicle.Vehicleendlatitude,
+        #             'End Position Longitude': vehicle.Vehicleendlongitude,
+        #             'Start Position Name': '',
+        #             'Planned Destination Name': '',
+        #             'Book Channel': 'others',
+        #             'Book Time (UTC)': start_time_utc.date().strftime("%Y-%m-%d"),  # Date portion of start time in UTC
+        #             'Trip Time (Seconds)': ride_duration_seconds,  # Ride duration in seconds
+        #             'Status': 'FINISHED',
+        #             'Payment Type': '',
+        #             'Reason': '',
+        #             'Distance (Meters)': vehicle.Ride_distance * 1000,  # Distance in meters
+        #             'Fare Amount': vehicle.Total_cost,
+        #             'Start Fare': '',
+        #             'Fare Distance Charge': '',
+        #             'Fare Time Charge': '',
+        #             'Tollways': '',
+        #             'Fare Extra': '',
+        #             'Fare Tax': '',
+        #             'Fare Tips': '',
+        #             'Fare Rate': '',
+        #             'Fare Unit': '',
+        #             'Booking Fee': '',
+        #             'Waiting Fee': '',
+        #             'Promotion-Code': '',
+        #             'Promotion-Type': '',
+        #             'Promotion Amount': '',
+        #             'City-Change-Charge': '',
+        #             'City-Change-Code': '',
+        #             'Fix-Charge': ''
+        #         })
+        #     else:
+        #         # Handle API request failure gracefully
+        #         print(f"Failed to fetch SUMSUB data for UserId: {vehicle.UserId}")
+        # except CustomerDetails.DoesNotExist:
+        #     print(f"CustomerDetails not found for UserId: {vehicle.UserId}")
+        # except Exception as e:
+        #     print(f"Error processing vehicle: {vehicle.id}, Error: {str(e)}")
 
     return response
 

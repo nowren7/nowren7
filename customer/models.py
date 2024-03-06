@@ -41,17 +41,27 @@ class ExcelFile(models.Model):
 
 
 class CustomerDetails(models.Model):
-    ID=models.IntegerField()
+    Customer_ID=models.IntegerField()
     name=models.CharField(max_length=200)
     email = models.EmailField(max_length=100)
     phonenumber=models.CharField(max_length=30)
     documentID=models.CharField(max_length=30)
+    Dob=models.DateField()
+    nationality=models.CharField(max_length=200)
+    driver_license_number=models.CharField(max_length=200)
+    driver_country_of_issue=models.CharField(max_length=200)
+    driver_date_of_issue= models.DateField() 
+    driver_date_of_expiry= models.DateField() 
+    emirates_id_passport_number=models.CharField(max_length=200)
+    emirates_id_passport_date_of_issue= models.DateField() 
+    emirates_id_passport_date_of_expiry= models.DateField() 
+    # ids = models.CharField(default="",null=True,blank=True)
 
     class Meta:
         verbose_name = 'customer'
         verbose_name_plural = 'customer'
     def __str__(self):
-         return str(self.ID)
+         return str(self.Customer_ID)
     
 class SalikDetails(models.Model):
     STATUS_CHOICES = [
