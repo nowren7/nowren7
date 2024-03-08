@@ -454,6 +454,8 @@ def merge_data(request):
 
 
 #salik pageSalik list Yaldi hourly - total.xls
+from datetime import datetime
+
 def salik_Finance(request):
     if request.method == 'POST':
         form = SalikExcelForm(request.POST, request.FILES)
@@ -466,7 +468,9 @@ def salik_Finance(request):
             for index, row in df.iterrows():
                 trip_date_str = str(row['Trip Date'])
                 try:
+                    # trip_date = datetime.strptime(trip_date_str, "%d %b %Y").date()
                     trip_date = datetime.strptime(trip_date_str, "%d %b %Y").date()
+
                 except ValueError:
                     trip_date = None
 
